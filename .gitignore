@@ -12,7 +12,7 @@ build/
 .venv
 venv/
 ENV/
-.env.*
+#.env.*
 
 # Node
 node_modules/
@@ -36,10 +36,11 @@ yarn-error.log*
 *.swo
 .idea/
 coverage/
+.windsurfrules
 
 # Ignore secrets
 .env.local
 .env.production
 .env.development
 .env.test
-.env.example
+# .env.example

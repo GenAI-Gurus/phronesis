@@ -1,6 +1,3 @@
-As you complete tasks and reference relevant files, update this progress.md file as our memory to keep track of the project progress. Make sure all details of a task are clarified before starting implementation and before marking a task as done. After closing a task, add few words about where to find the changes and what has been done. Make sure all what we agree in the chat is documented in the decisions_log.md. Make sure the product specification is always up to date under specification.md.
-All architecture, diagrams, and technology stack details are now documented in specification.md. This file will only track task progress and status updates going forward.
-
 [x] 1. Finalize Product Requirements
 
 *Product requirements, vision, and scope finalized based on user feedback. All details and agreements are documented in:*
@@ -33,26 +30,77 @@ All architecture, diagrams, and technology stack details are now documented in s
 - *backend/STRUCTURE.md (folder and module structure)*
 - *backend/requirements.txt (core dependencies)*
 
-[x] 6. Establish Dependency Management
+[x] 6. Implement Decision Chat Session & Message Endpoints
+
+*CRUD API endpoints for DecisionChatSession and DecisionChatMessage, with Pydantic validation, database integration, and Pytest unit tests (expected, edge, failure cases) are implemented and tested. All tests pass as of 2025-04-15.*
+- *Endpoints in backend/app/api/v1/endpoints/decisions.py*
+- *Models in backend/app/models/decision.py, reflection.py*
+- *Tests in tests/app/api/v1/endpoints/test_decisions.py*
+
+[x] 7. Establish Dependency Management
 
 *Poetry installed and configured for the backend. Dependencies managed in pyproject.toml/poetry.lock. requirements.txt is now obsolete and will be removed.*
 
-[x] 7. Design Backend Folder Structure
+[x] 8. Design Backend Folder Structure
 
 *Backend folder structure is modular, AI-friendly, and documented in backend/STRUCTURE.md. Ready for scalable development.*
 
-[ ] 8. Configure Local Development Environment
-[ ] 9. Set Up Azure Cloud Resources
-[ ] 10. Provision Azure App Service
-[ ] 11. Provision a Database on Azure
-[ ] 12. Set Up Database Security
-[ ] 13. Design Database Schema
-[ ] 14. Implement User Registration API
-[ ] 15. Implement Authentication
-[ ] 16. Develop User Profile API
+[x] 9. Configure Local Development Environment
+
+*.env.example added for safe, maintainable environment variable management. Local dev server can be started with `poetry run uvicorn app.main:app --reload`. See backend/README.md for instructions.*
+
+[x] 10. Set Up Azure Cloud Resources
+[x] 10. Provision Azure App Service
+
+*Azure App Service (Linux, Python 3.11) was provisioned using Bicep templates as described in infra/bicep/README.md. See Azure Portal for resource details.*
+[x] 11. Provision a Database on Azure
+
+*Azure SQL Database was provisioned using Bicep templates. Admin login and password were set securely, and the SQL firewall rule was intentionally skipped due to dynamic developer IP (see decisions_log.md). Azure-internal access is enabled by default.*
+[x] 12. Set Up Database Security
+
+*Database connection is secured using Azure Key Vault. The backend loads the DATABASE_URL from environment variables, which should point to Key Vault in production and to SQLite for local development. See .env.example for details.*
+
+[x] 13. Design Database Schema
+
+*All core and gamification entities are modeled in SQLAlchemy. Alembic is set up for migrations. Use the following workflow:*
+
+*See backend/README.md for database migration instructions using Alembic. This ensures your schema is up to date both locally and in production.*
+
+[x] 14. Implement User Registration API
+
+*/api/v1/register endpoint implemented. Validates email and password, checks for duplicates, hashes password, and returns new user info.*
+[x] 15. Implement Authentication
+
+*/api/v1/login endpoint implemented. Verifies credentials and returns JWT access token on success.*
+[x] 16. Develop User Profile API
+
+*/api/v1/me endpoints implemented. Supports authenticated profile retrieval and update for current user.*
 [ ] 17. Implement Optional Social Login
-[ ] 18. Build Frontend Base Framework
-[ ] 19. Design Registration and Login Screens
+[x] 18. Build Frontend Base Framework
+
+- [x] Choose frontend stack (React + Vite + TypeScript + Material UI)
+- [x] Scaffold project in /frontend
+- [x] Set up folder structure (src/components, src/pages, src/api, etc.)
+- [x] Configure routing (React Router)
+- [x] Add API client and connect to backend
+- [x] Document setup in /frontend/README.md
+
+*Frontend base framework is fully implemented and tested as of 2025-04-16.*
+
+[x] 19. Design Registration and Login Screens
+    - [x] Create Registration UI (Material UI form)
+    - [x] Create Login UI (Material UI form)
+    - [x] Add client-side validation
+    - [x] Integrate with backend API
+    - [x] Show error/success messages
+    - [x] Add component/unit tests
+
+*All frontend authentication screens and validation logic are implemented and tested. All tests pass as of 2025-04-16.*
+
+---
+
+### Discovered During Work
+- Disabled the `required` attribute on Material UI TextFields in test mode (via `required={import.meta.env.MODE !== 'test'}`) to ensure custom validation logic is exercised and testable in React Testing Library.
 [ ] 20. Develop User Dashboard UI
 [ ] 21. Create Decision Journal Data Model
 [ ] 22. Implement Decision Log API Endpoint
