@@ -8,9 +8,11 @@ import uuid
 
 router = APIRouter()
 
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: constr(min_length=8)
+
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register_user(user_in: UserCreate, db: Session = Depends(get_db)):

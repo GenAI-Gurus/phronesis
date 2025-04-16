@@ -13,12 +13,15 @@ import datetime
 
 router = APIRouter()
 
+
 class DecisionMessageCreate(BaseModel):
     content: str
     sender: str = Field(..., pattern="^(user|ai)$")
 
+
 class DecisionSessionCreate(BaseModel):
     title: constr(min_length=1)
+
 
 class DecisionSessionOut(BaseModel):
     id: UUID
@@ -32,8 +35,13 @@ class DecisionSessionOut(BaseModel):
     class Config:
         orm_mode = True
 
+
 @router.post("/sessions", response_model=DecisionSessionOut, status_code=201)
-def create_decision_session(session_in: DecisionSessionCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def create_decision_session(
+    session_in: DecisionSessionCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     session = DecisionChatSession(
         id=uuid.uuid4(),
         user_id=current_user.id,
@@ -48,9 +56,17 @@ def create_decision_session(session_in: DecisionSessionCreate, db: Session = Dep
     db.refresh(session)
     return session
 
+
 @router.get("/sessions", response_model=List[DecisionSessionOut])
-def list_decision_sessions(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return db.query(DecisionChatSession).filter(DecisionChatSession.user_id == current_user.id).all()
+def list_decision_sessions(
+    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    return (
+        db.query(DecisionChatSession)
+        .filter(DecisionChatSession.user_id == current_user.id)
+        .all()
+    )
+
 
 class DecisionMessageOut(BaseModel):
     id: UUID
@@ -62,29 +78,46 @@ class DecisionMessageOut(BaseModel):
     class Config:
         orm_mode = True
 
+
 class DecisionSessionUpdate(BaseModel):
     status: Optional[str] = None
     summary: Optional[str] = None
     insights: Optional[str] = None
     completed_at: Optional[datetime.datetime] = None
 
-@router.post("/sessions/{session_id}/messages", response_model=DecisionMessageOut, status_code=201)
-def create_decision_message(session_id: str, message_in: DecisionMessageCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+
+@router.post(
+    "/sessions/{session_id}/messages",
+    response_model=DecisionMessageOut,
+    status_code=201,
+)
+def create_decision_message(
+    session_id: str,
+    message_in: DecisionMessageCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """
     Create a new message in a decision chat session.
     """
     import uuid
+
     # Convert session_id to UUID
     try:
         session_uuid = uuid.UUID(session_id)
     except (ValueError, AttributeError):
         raise HTTPException(status_code=422, detail="Invalid session_id format")
     # Check session ownership
-    session = db.query(DecisionChatSession).filter_by(id=session_uuid, user_id=current_user.id).first()
+    session = (
+        db.query(DecisionChatSession)
+        .filter_by(id=session_uuid, user_id=current_user.id)
+        .first()
+    )
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     # Reason: Enum conversion for sender
     from app.models.reflection import MessageType
+
     try:
         sender_enum = MessageType[message_in.sender]
     except KeyError:
@@ -94,44 +127,71 @@ def create_decision_message(session_id: str, message_in: DecisionMessageCreate, 
         session_id=session_uuid,
         sender=sender_enum,
         content=message_in.content,
-        created_at=datetime.datetime.utcnow()
+        created_at=datetime.datetime.utcnow(),
     )
     db.add(message)
     db.commit()
     db.refresh(message)
     return message
 
+
 @router.get("/sessions/{session_id}/messages", response_model=List[DecisionMessageOut])
-def list_decision_messages(session_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def list_decision_messages(
+    session_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """
     List all messages for a given decision chat session.
     """
     import uuid
+
     try:
         session_uuid = uuid.UUID(session_id)
     except (ValueError, AttributeError):
         raise HTTPException(status_code=422, detail="Invalid session_id format")
-    session = db.query(DecisionChatSession).filter_by(id=session_uuid, user_id=current_user.id).first()
+    session = (
+        db.query(DecisionChatSession)
+        .filter_by(id=session_uuid, user_id=current_user.id)
+        .first()
+    )
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
-    return db.query(DecisionChatMessage).filter_by(session_id=session_uuid).order_by(DecisionChatMessage.created_at).all()
+    return (
+        db.query(DecisionChatMessage)
+        .filter_by(session_id=session_uuid)
+        .order_by(DecisionChatMessage.created_at)
+        .all()
+    )
+
 
 @router.patch("/sessions/{session_id}", response_model=DecisionSessionOut)
-def update_decision_session(session_id: str, session_update: DecisionSessionUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def update_decision_session(
+    session_id: str,
+    session_update: DecisionSessionUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """
     Update a decision chat session (status, summary, insights, completed_at).
     """
     import uuid
+
     try:
         session_uuid = uuid.UUID(session_id)
     except (ValueError, AttributeError):
         raise HTTPException(status_code=422, detail="Invalid session_id format")
-    session = db.query(DecisionChatSession).filter_by(id=session_uuid, user_id=current_user.id).first()
+    session = (
+        db.query(DecisionChatSession)
+        .filter_by(id=session_uuid, user_id=current_user.id)
+        .first()
+    )
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     if session_update.status:
         # Reason: Validate status against enum
         from app.models.decision import SessionStatus
+
         try:
             session.status = SessionStatus[session_update.status]
         except KeyError:
@@ -145,5 +205,6 @@ def update_decision_session(session_id: str, session_update: DecisionSessionUpda
     db.commit()
     db.refresh(session)
     return session
+
 
 # Endpoints for deleting sessions/messages can be added as needed.

@@ -1,6 +1,7 @@
 """
 Security utilities for password hashing, token creation, and authentication dependencies.
 """
+
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
@@ -34,6 +35,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def create_access_token(data: dict, expires_delta=None) -> str:
     """Create a JWT access token."""
     from datetime import datetime, timedelta
+
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=60))
     to_encode.update({"exp": expire})
@@ -42,7 +44,10 @@ def create_access_token(data: dict, expires_delta=None) -> str:
 
 import uuid
 
-def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
+
+def get_current_user(
+    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+) -> User:
     """Dependency to get the current authenticated user from JWT token."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

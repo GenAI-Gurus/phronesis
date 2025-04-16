@@ -7,10 +7,12 @@ import datetime
 import enum
 from .user import Base
 
+
 class SessionStatus(enum.Enum):
     context_gathering = "context_gathering"
     reflection = "reflection"
     completed = "completed"
+
 
 class DecisionChatSession(Base):
     __tablename__ = "decision_chat_sessions"

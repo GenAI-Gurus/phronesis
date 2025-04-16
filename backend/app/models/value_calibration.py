@@ -6,6 +6,7 @@ import uuid
 import datetime
 from .user import Base
 
+
 class ValueCalibrationCheckin(Base):
     __tablename__ = "value_calibration_checkins"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

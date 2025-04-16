@@ -7,6 +7,7 @@ from app.core.security import get_current_user
 
 router = APIRouter()
 
+
 class UserProfile(BaseModel):
     id: str
     email: EmailStr
@@ -16,12 +17,18 @@ class UserProfile(BaseModel):
     class Config:
         orm_mode = True
 
+
 @router.get("/me", response_model=UserProfile)
 def read_profile(current_user: User = Depends(get_current_user)):
     return current_user
 
+
 @router.put("/me", response_model=UserProfile)
-def update_profile(update: UserProfile, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def update_profile(
+    update: UserProfile,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     current_user.email = update.email
     db.commit()
     db.refresh(current_user)
