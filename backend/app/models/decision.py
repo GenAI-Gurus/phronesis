@@ -17,8 +17,8 @@ class SessionStatus(enum.Enum):
 
 class DecisionChatSession(Base):
     __tablename__ = "decision_chat_sessions"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    id = Column(String(36), primary_key=True, default=uuid.uuid4)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     title = Column(String, nullable=False)  # Added title column
     started_at = Column(DateTime, default=datetime.datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
@@ -46,8 +46,8 @@ class DecisionJournalEntry(Base):
     """
 
     __tablename__ = "decision_journal_entries"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    id = Column(String(36), primary_key=True, default=uuid.uuid4)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     title = Column(String, nullable=False)
     context = Column(String, nullable=True)
     anticipated_outcomes = Column(String, nullable=True)
