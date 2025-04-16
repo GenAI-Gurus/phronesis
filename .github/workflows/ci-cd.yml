@@ -28,6 +28,8 @@ jobs:
         run: poetry install --no-root
       - name: Lint (black)
         run: poetry run black --check app tests
+      - name: Clean SQLite test database
+        run: rm -f test.db
       - name: Run backend tests (pytest)
         run: PYTHONPATH=. poetry run pytest --maxfail=1 --disable-warnings --tb=short
 
