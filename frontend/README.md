@@ -34,6 +34,17 @@ The app will be available at [http://localhost:5173](http://localhost:5173) by d
 
 - ESLint and Prettier recommended for code quality and consistency.
 
+## Demo & Placeholder Pages
+
+- The app includes placeholder pages for New Decision Journal, Value Calibration, Reflection, and Challenges.
+- These are accessible from the Dashboard quick actions and via direct URLs:
+  - `/journal/new`
+  - `/value-calibration`
+  - `/reflection`
+  - `/challenges`
+- These pages are for development/demo purposes only and help preview the intended app navigation and UI/UX.
+- **Cleanup Note:** Remove or replace these placeholders with real features before production release.
+
 ## Next Steps
 - Implement routing and connect to backend API.
 - Build out registration, login, and dashboard screens.

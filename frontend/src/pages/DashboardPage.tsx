@@ -1,11 +1,30 @@
 // src/pages/DashboardPage.tsx
 import React from 'react';
-import { Box, Typography, Button, Link as MuiLink } from '@mui/material';
-import { useNavigate, Link } from 'react-router-dom';
+import { Box, Typography, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import UserSummaryCard from '../components/dashboard/UserSummaryCard';
+import RecentJournalsList, { JournalEntry } from '../components/dashboard/RecentJournalsList';
+import QuickActions from '../components/dashboard/QuickActions';
+import ProgressBadges, { Badge } from '../components/dashboard/ProgressBadges';
 
+/**
+ * DashboardPage displays the main user dashboard with summary, journals, actions, and badges.
+ * Modular, responsive, and ready for backend integration.
+ */
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const jwt = localStorage.getItem('jwt');
+
+  // TODO: Replace with real API calls
+  const mockUser = { name: 'Alex Example', email: 'alex@example.com' };
+  const mockJournals: JournalEntry[] = [
+    { id: '1', title: 'Should I switch jobs?', created_at: '2025-04-13T10:00:00Z' },
+    { id: '2', title: 'Buying a new car decision', created_at: '2025-04-10T15:30:00Z' }
+  ];
+  const mockBadges: Badge[] = [
+    { id: 'b1', name: 'Reflector', description: 'Completed first reflection' },
+    { id: 'b2', name: 'Streak Starter', description: 'Logged decisions 3 days in a row' }
+  ];
 
   const handleLogout = () => {
     localStorage.removeItem('jwt');
@@ -16,18 +35,20 @@ const DashboardPage: React.FC = () => {
     return (
       <Box maxWidth={400} mx="auto" mt={6} textAlign="center">
         <Typography variant="h5" mb={2}>You are not logged in.</Typography>
-        <MuiLink component={Link} to="/login">Go to Login</MuiLink>
+        <Button variant="contained" onClick={() => navigate('/login')}>Go to Login</Button>
       </Box>
     );
   }
 
   return (
-    <Box maxWidth={600} mx="auto" mt={6} textAlign="center">
-      <Typography variant="h4" mb={2}>Welcome to your Dashboard!</Typography>
-      <Typography variant="body1" mb={4}>You are authenticated.</Typography>
-      <Button variant="outlined" color="secondary" onClick={handleLogout}>
-        Logout
-      </Button>
+    <Box maxWidth={800} mx="auto" mt={6}>
+      <UserSummaryCard name={mockUser.name} email={mockUser.email} />
+      <QuickActions />
+      <RecentJournalsList journals={mockJournals} />
+      <ProgressBadges badges={mockBadges} />
+      <Box mt={2} textAlign="center">
+        <Button variant="outlined" color="secondary" onClick={handleLogout}>Logout</Button>
+      </Box>
     </Box>
   );
 };

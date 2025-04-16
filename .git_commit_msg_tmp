@@ -1,0 +1,3 @@
+fix(frontend): ensure index.html is present for Vite build
+
+- Add frontend/index.html to git so Vite can find the entry module and build succeeds in CI
