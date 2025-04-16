@@ -36,4 +36,5 @@ python-jose = "^3.4.0"
 email-validator = "^2.2.0"
 black = "^24.4.2"
 python-dotenv = "^1.1.0"
+pre-commit = "^4.2.0"
 
