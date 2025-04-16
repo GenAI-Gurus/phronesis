@@ -1,0 +1,56 @@
+name: Deploy Backend to Azure App Service (Docker)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      AZURE_WEBAPP_NAME: phronesis-backend-app  # <-- CHANGE THIS
+      AZURE_WEBAPP_PACKAGE_PATH: backend
+      DOCKERFILE_PATH: backend/Dockerfile
+      PYTHON_VERSION: '3.11'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and push Docker image to Azure Container Registry (if using ACR)
+        if: false  # Skip if deploying directly from repo
+        run: |
+          echo "Add ACR build/push steps here if needed."
+
+      - name: Deploy to Azure Web App (Docker)
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: 'DOCKER|${{ github.repository }}:latest'
+          # If using ACR, set images: '<youracr>.azurecr.io/phronesis-backend:latest'
+
+      - name: Post-deployment - Run Alembic migrations
+        run: |
+          # SSH into the app or use Azure CLI to run migrations if needed
+          echo "Manual step: Run poetry run alembic upgrade head if DB schema changed."
+
+# Instructions:
+# 1. Set your Azure Web App name above.
+# 2. In Azure Portal, go to your Web App > Get publish profile. Download and copy its contents.
+# 3. In GitHub repo settings > Secrets and variables > Actions, add a new secret:
+#    Name: AZURE_WEBAPP_PUBLISH_PROFILE
+#    Value: (paste the publish profile XML)
+# 4. (Optional) For service principal login, use AZURE_CREDENTIALS instead.
