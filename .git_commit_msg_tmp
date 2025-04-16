@@ -1,6 +1,0 @@
-feat(frontend): implement Value Calibration UI with sliders and validation
-
-- Add interactive ValueCalibrationPage with sliders for core values (Courage, Honesty, Curiosity, Empathy, Resilience)
-- Mock submit handler, client-side validation, and user feedback
-- Add unit tests for expected, edge, and failure cases
-- Fulfills progress.md step 31 (Design Value Calibration UI)

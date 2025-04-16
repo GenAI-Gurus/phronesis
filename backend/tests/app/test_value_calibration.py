@@ -31,10 +31,18 @@ def test_checkin_edge_empty_snapshot():
     assert checkin.value_snapshot == "{}"
 
 
+from sqlalchemy.exc import IntegrityError
+from app.db.session import SessionLocal
+
 def test_checkin_failure_missing_user_id():
-    with pytest.raises(TypeError):
-        ValueCalibrationCheckin(
-            id=uuid.uuid4(),
-            created_at=datetime.datetime.utcnow(),
-            value_snapshot='{"courage": 7}',
-        )
+    checkin = ValueCalibrationCheckin(
+        id=uuid.uuid4(),
+        created_at=datetime.datetime.utcnow(),
+        value_snapshot='{"courage": 7}',
+    )
+    db = SessionLocal()
+    db.add(checkin)
+    with pytest.raises(IntegrityError):
+        db.commit()
+    db.rollback()
+    db.close()

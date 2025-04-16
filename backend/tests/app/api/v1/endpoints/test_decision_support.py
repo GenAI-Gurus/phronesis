@@ -9,8 +9,9 @@ app.dependency_overrides = {}
 from app.core.security import get_current_user
 
 
+import uuid
 class DummyUser:
-    id = "test-user-id"
+    id = uuid.uuid4()
     email = "test@example.com"
     is_active = True
     is_superuser = False

@@ -38,6 +38,9 @@ yarn-error.log*
 .idea/
 coverage/
 .windsurfrules
+test.db
+backend/test.db
+.git_commit_msg_tmp
 
 # Ignore secrets
 .env.local
