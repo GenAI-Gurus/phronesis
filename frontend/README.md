@@ -34,6 +34,14 @@ The app will be available at [http://localhost:5173](http://localhost:5173) by d
 
 - ESLint and Prettier recommended for code quality and consistency.
 
+## CI/CD & Troubleshooting
+
+- The frontend pipeline (GitHub Actions) now passes: it installs dependencies, lints, runs Vitest tests, and builds with Vite.
+- **index.html** must be present and tracked by git, or the build will fail.
+- If you add new pages/components, ensure all files are committed or the build/test may fail in CI.
+- If you see a "Could not resolve entry module 'index.html'" error, check that `frontend/index.html` exists and is tracked.
+- See the main project README for more CI/CD troubleshooting tips.
+
 ## Demo & Placeholder Pages
 
 - The app includes placeholder pages for New Decision Journal, Value Calibration, Reflection, and Challenges.

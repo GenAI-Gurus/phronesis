@@ -1,3 +1,6 @@
-fix(frontend): ensure index.html is present for Vite build
+feat(frontend): implement Value Calibration UI with sliders and validation
 
-- Add frontend/index.html to git so Vite can find the entry module and build succeeds in CI
+- Add interactive ValueCalibrationPage with sliders for core values (Courage, Honesty, Curiosity, Empathy, Resilience)
+- Mock submit handler, client-side validation, and user feedback
+- Add unit tests for expected, edge, and failure cases
+- Fulfills progress.md step 31 (Design Value Calibration UI)

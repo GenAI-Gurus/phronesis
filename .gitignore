@@ -28,6 +28,7 @@ yarn-error.log*
 .DS_Store
 
 # Others
+.env
 *.sqlite3
 *.log
 *.pot

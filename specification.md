@@ -13,7 +13,49 @@ The platform should feel warm and supportive, offering encouragement and empathy
 - Focus on a functional MVP that implements the tasks listed in progress.md.
 - Prioritize features that support reflection, journaling, and basic value assessment.
 
+## CI/CD Status & Contributor Guidance (as of 2025-04-16)
+- Both backend and frontend CI/CD pipelines (GitHub Actions) are fully passing.
+- **Backend pipeline:** Installs with Poetry, checks formatting with Black, and runs all pytest tests with `PYTHONPATH=.`. Contributors must ensure code is formatted and all tests pass before merging.
+- **Frontend pipeline:** Installs Node dependencies, lints with ESLint, runs Vitest tests, and builds with Vite. All source files (especially `index.html` and new components/pages) must be tracked by git.
+- **Troubleshooting:**
+  - If backend tests fail with import errors, check `PYTHONPATH=.` and module locations.
+  - If frontend build fails, ensure `index.html` is present and all relevant files are committed.
+  - If Black fails, run `poetry run black app tests` and commit.
+- See README.md files for more troubleshooting and pipeline details.
+
 ## Frontend Authentication & Validation (as of 2025-04-16)
+
+## Tension Detector Logic
+- Backend service for detecting "tension" in user value check-ins.
+- Flags:
+  - Value conflicts (e.g., high scores for values that are often in tension, such as Courage vs. Caution).
+  - Rapid swings in a value over time (change of 5+ points between check-ins).
+- Used for analytics, user feedback, and future AI guidance.
+- Fully unit tested (expected, edge, failure cases).
+
+## Decision Support Chat API
+- **Endpoint:** `POST /api/v1/decision-support/chat`
+- **Request:**
+  ```json
+  {
+    "messages": [
+      { "role": "user", "content": "I'm struggling with a big decision." }
+    ],
+    "context": "optional context or metadata"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "reply": "AI: I see you said 'I'm struggling with a big decision.'. How can I help you think this through?",
+    "suggestions": ["Clarify your goals", "Consider possible outcomes", "Reflect on your values"]
+  }
+  ```
+- **Behavior:**
+  - Last message must be from the user; otherwise, returns 400.
+  - Returns a mock AI reply and suggestions for now (OpenAI integration can be added later).
+- **Tests:** Fully unit tested (expected, edge, failure cases).
+
 - Registration and Login UI implemented with React, Vite, TypeScript, and Material UI.
 - All client-side validation, error handling, and backend integration are complete.
 - All authentication-related frontend tests pass.

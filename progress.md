@@ -114,10 +114,14 @@
 [ ] 28. Implement Auto Tagging and Categorization
 [ ] 29. Develop API for Value Calibration
 [ ] 30. Create Value Calibration Data Model
-[ ] 31. Design Value Calibration UI
-[ ] 32. Implement Tension Detector Logic
-[ ] 33. Build Decision Support Chat API
-[ ] 34. Develop Chat UI for Decision Support
+[x] 31. Design Value Calibration UI
+    - Interactive UI with sliders for core values (Courage, Honesty, Curiosity, Empathy, Resilience), validation, feedback, and unit tests implemented in ValueCalibrationPage.tsx.
+[x] 32. Implement Tension Detector Logic
+    - Backend service detects value conflicts and rapid swings in user check-ins. Comprehensive unit tests (expected, edge, failure cases) in test_tension_detector.py.
+[x] 33. Build Decision Support Chat API
+    - FastAPI endpoint /api/v1/decision-support/chat (POST) with request/response schemas. Returns mock AI reply and suggestions. Fully unit tested (expected, edge, failure cases).
+[x] 34. Develop Chat UI for Decision Support
+    - Modern Material UI chat interface (DecisionSupportChatPage.tsx): user/AI messages, suggestions as quick actions, loading/error states, and unit tests.
 [ ] 35. Integrate OpenAI Chat API
 [ ] 36. Implement Future-Self Simulator Backend
 [ ] 37. Develop Simulator UI Component

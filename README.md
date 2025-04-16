@@ -6,13 +6,18 @@
 
 **CI/CD Pipeline**
 
-Phronesis uses [GitHub Actions](https://github.com/features/actions) for continuous integration and deployment:
+Phronesis uses [GitHub Actions](https://github.com/features/actions) for continuous integration and deployment. Both backend and frontend pipelines are now fully passing as of 2025-04-16:
 
-- **Backend**: Installs with Poetry, checks formatting with Black, and runs all `pytest` tests.
-- **Frontend**: Installs Node dependencies, lints with ESLint, runs Vitest tests, and builds the app.
+- **Backend**: Installs with Poetry, checks formatting with Black, and runs all `pytest` tests with `PYTHONPATH=.`, ensuring all modules are discoverable. Code must be formatted with Black and all tests must pass.
+- **Frontend**: Installs Node dependencies, lints with ESLint, runs Vitest tests, and builds the app with Vite. Make sure `frontend/index.html` and all required source files are tracked by git.
 - **Deployment**: Azure deployment steps can be added by maintainers (see workflow file for details).
 
-See `.github/workflows/ci-cd.yml` for the full pipeline configuration.
+**Troubleshooting:**
+- If the backend fails with import errors, ensure `PYTHONPATH=.` is set for tests and all modules are in the correct location.
+- If the frontend build fails, check that `index.html` exists and is committed, and that all page/component files are present.
+- If Black fails, run `poetry run black app tests` and commit the changes.
+
+See `.github/workflows/ci-cd.yml` for the full pipeline configuration and troubleshooting examples.
 
 ---
 

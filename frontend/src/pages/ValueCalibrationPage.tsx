@@ -49,7 +49,7 @@ const ValueCalibrationPage: React.FC = () => {
       // Mock API call
       await new Promise((resolve) => setTimeout(resolve, 600));
       setSuccess(true);
-    } catch (err) {
+    } catch {
       setError('Failed to submit value calibration.');
     } finally {
       setSubmitting(false);

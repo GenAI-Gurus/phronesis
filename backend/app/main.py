@@ -1,4 +1,6 @@
 # backend/app/main.py
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi import FastAPI
 
 app = FastAPI(title="Phronesis API", version="0.1.0")
@@ -25,6 +27,10 @@ app.include_router(profile.router, prefix="/api/v1", tags=["profile"])
 from app.api.v1.endpoints import decisions
 
 app.include_router(decisions.router, prefix="/api/v1/decisions", tags=["decisions"])
+
+from app.api.v1.endpoints import decision_support
+
+app.include_router(decision_support.router, prefix="/api/v1/decision-support", tags=["decision-support"])
 
 
 @app.get("/")
