@@ -35,7 +35,7 @@ jobs:
       - name: Show backend dir after DB cleanup
         run: ls -l
       - name: Run backend tests (pytest)
-        run: PYTHONPATH=. poetry run pytest --maxfail=1 --disable-warnings --tb=short
+        run: PYTHONPATH=. poetry run pytest --maxfail=1 --disable-warnings --tb=short -s
 
   frontend:
     name: Frontend (React, Vite)
