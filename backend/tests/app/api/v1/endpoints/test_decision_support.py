@@ -7,19 +7,22 @@ client = TestClient(app)
 # Mock user authentication dependency for testing
 app.dependency_overrides = {}
 from app.core.security import get_current_user
-
+import pytest
 
 import uuid
 
 
-class DummyUser:
-    id = uuid.uuid4()
-    email = "test@example.com"
-    is_active = True
-    is_superuser = False
+@pytest.fixture(autouse=True)
+def mock_auth():
+    class DummyUser:
+        id = uuid.uuid4()
+        email = "test@example.com"
+        is_active = True
+        is_superuser = False
 
-
-app.dependency_overrides[get_current_user] = lambda: DummyUser()
+    app.dependency_overrides[get_current_user] = lambda: DummyUser()
+    yield
+    app.dependency_overrides = {}
 
 
 def test_decision_support_chat_expected():

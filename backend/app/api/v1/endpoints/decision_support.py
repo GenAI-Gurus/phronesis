@@ -76,7 +76,15 @@ def decision_support_chat(
             return DecisionSupportResponse(reply=reply, suggestions=suggestions)
     else:
         # Fallback if OpenAI not installed or no API key
-        reply = f"AI (mock): I see you said '{last_user_msg}'. How can I help you think this through? (OpenAI not configured)"
+        reply = (
+            "Making big decisions can be challenging. Here are some steps you can try: "
+            "1. Clarify what decision you need to make. "
+            "2. List your options and possible outcomes. "
+            "3. Reflect on your values and priorities. "
+            "4. Consider who might be affected by your decision. "
+            "5. Seek advice if needed. "
+            "Would you like to talk through any of these steps or share more details?"
+        )
         suggestions = [
             "Clarify your goals",
             "Consider possible outcomes",

@@ -7,6 +7,8 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 
+app.dependency_overrides = {}
+
 client = TestClient(app)
 
 import pytest
