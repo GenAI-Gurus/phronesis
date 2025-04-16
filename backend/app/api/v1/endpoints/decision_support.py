@@ -7,17 +7,21 @@ from app.models.user import User
 
 router = APIRouter()
 
+
 class DecisionSupportMessage(BaseModel):
     role: str = Field(..., description="user or ai")
     content: str
+
 
 class DecisionSupportRequest(BaseModel):
     messages: List[DecisionSupportMessage]
     context: Optional[str] = Field(None, description="Optional context or metadata")
 
+
 class DecisionSupportResponse(BaseModel):
     reply: str
     suggestions: Optional[List[str]] = None
+
 
 # --- OpenAI GPT-4.1 integration ---
 try:
@@ -26,6 +30,7 @@ except ImportError:
     openai = None
 
 OPENAI_MODEL = "gpt-4-1106-preview"  # GPT-4.1 model
+
 
 @router.post("/chat", response_model=DecisionSupportResponse)
 def decision_support_chat(
@@ -44,8 +49,7 @@ def decision_support_chat(
         try:
             openai_client = openai.OpenAI(api_key=api_key)
             chat_history = [
-                {"role": m.role, "content": m.content}
-                for m in req.messages
+                {"role": m.role, "content": m.content} for m in req.messages
             ]
             response = openai_client.chat.completions.create(
                 model=OPENAI_MODEL,
@@ -58,7 +62,7 @@ def decision_support_chat(
             suggestions = [
                 "Clarify your goals",
                 "Consider possible outcomes",
-                "Reflect on your values"
+                "Reflect on your values",
             ]
             return DecisionSupportResponse(reply=reply, suggestions=suggestions)
         except Exception as e:
@@ -67,7 +71,7 @@ def decision_support_chat(
             suggestions = [
                 "Clarify your goals",
                 "Consider possible outcomes",
-                "Reflect on your values"
+                "Reflect on your values",
             ]
             return DecisionSupportResponse(reply=reply, suggestions=suggestions)
     else:
@@ -76,6 +80,6 @@ def decision_support_chat(
         suggestions = [
             "Clarify your goals",
             "Consider possible outcomes",
-            "Reflect on your values"
+            "Reflect on your values",
         ]
         return DecisionSupportResponse(reply=reply, suggestions=suggestions)

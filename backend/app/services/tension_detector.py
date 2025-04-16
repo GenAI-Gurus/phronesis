@@ -1,11 +1,13 @@
 from typing import List, Dict, Any
 import datetime
 
+
 class TensionDetector:
     """
     Detects 'tension' in user value check-ins.
     Flags if there are conflicting values or rapid swings in tracked values.
     """
+
     # Example: Courage vs. Caution are often in tension; here we use a generic example.
     CONFLICT_PAIRS = [
         ("Courage", "Caution"),
@@ -43,7 +45,10 @@ class TensionDetector:
             prev = history[0][value]
             for entry in history[1:]:
                 curr = entry.get(value)
-                if curr is not None and abs(curr - prev) >= TensionDetector.RAPID_CHANGE_THRESHOLD:
+                if (
+                    curr is not None
+                    and abs(curr - prev) >= TensionDetector.RAPID_CHANGE_THRESHOLD
+                ):
                     swings.append(f"Rapid swing in {value}: {prev} -> {curr}")
                 prev = curr
         return swings
