@@ -156,7 +156,7 @@
 ---
 
 ### Next Steps: Azure Deployment
-[ ] 50. Prepare backend for Azure App Service (Dockerfile or Gunicorn/Uvicorn config, environment variables)
+[x] 50. Prepare backend for Azure App Service (Dockerfile or Gunicorn/Uvicorn config, environment variables) (IN PROGRESS)
 [ ] 51. Prepare frontend for Azure Static Web Apps (ensure build output is ready)
 [ ] 52. Connect Azure Key Vault or App Service settings for secrets (OPENAI_API_KEY, DB connection, etc.)
 [ ] 53. Add GitHub Actions deployment step for backend (azure/webapps-deploy@v3)
