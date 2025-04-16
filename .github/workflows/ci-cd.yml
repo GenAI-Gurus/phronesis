@@ -22,7 +22,8 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        # Use --no-root because this project is not a Poetry package (no installable backend module)
+        run: poetry install --no-root
       - name: Lint (black)
         run: poetry run black --check app tests
       - name: Run backend tests (pytest)
