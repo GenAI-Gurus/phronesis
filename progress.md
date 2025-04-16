@@ -101,7 +101,9 @@
 
 ### Discovered During Work
 - Disabled the `required` attribute on Material UI TextFields in test mode (via `required={import.meta.env.MODE !== 'test'}`) to ensure custom validation logic is exercised and testable in React Testing Library.
-[ ] 20. Develop User Dashboard UI
+[x] 20. Develop User Dashboard UI
+
+*Modular dashboard UI implemented in React with Material UI. Includes user summary, recent journals, quick actions, and progress badges. Unit tests cover expected, edge, and failure cases. Ready for backend integration and further enhancements.*
 [ ] 21. Create Decision Journal Data Model
 [ ] 22. Implement Decision Log API Endpoint
 [ ] 23. Build Decision Journal Form UI
@@ -130,5 +132,6 @@
 [ ] 46. Integrate Application Insights
 [ ] 47. Establish Automated Testing
 [ ] 48. Perform Load and Stress Testing
-[ ] 49. Set Up CI/CD Pipeline
+[x] 49. Set Up CI/CD Pipeline
+    - GitHub Actions is now configured for backend (FastAPI, Poetry) and frontend (React, Vite) CI. See .github/workflows/ci-cd.yml and README.md for details.
 [ ] 50. Deploy MVP to Production
