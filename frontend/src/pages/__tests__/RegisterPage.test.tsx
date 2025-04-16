@@ -2,6 +2,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import RegisterPage from '../RegisterPage';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -32,7 +33,7 @@ describe('RegisterPage', () => {
     await waitFor(() => {
       const errorAlert = screen.getByTestId('form-error');
       try {
-        expect(errorAlert.textContent).toMatch(/Email and password are required/);
+        expect(errorAlert.textContent).toMatch(/Email and password are required\.?/);
       } catch (e) {
         // Print the full DOM for debugging if the assertion fails
         // eslint-disable-next-line no-console
@@ -54,7 +55,7 @@ describe('RegisterPage', () => {
   });
 
   it('shows success message after successful registration', async () => {
-    (api.post as jest.Mock).mockResolvedValue({});
+    (api.post as Mock).mockResolvedValue({});
     render(<RegisterPage />, { wrapper: MemoryRouter });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'longenoughpassword' } });
@@ -63,7 +64,7 @@ describe('RegisterPage', () => {
   });
 
   it('shows error message on API failure', async () => {
-    (api.post as jest.Mock).mockRejectedValue({ response: { data: { detail: 'Email already registered' } } });
+    (api.post as Mock).mockRejectedValue({ response: { data: { detail: 'Email already registered' } } });
     render(<RegisterPage />, { wrapper: MemoryRouter });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'longenoughpassword' } });
