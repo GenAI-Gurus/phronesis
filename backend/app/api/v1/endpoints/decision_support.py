@@ -77,13 +77,12 @@ def decision_support_chat(
     else:
         # Fallback if OpenAI not installed or no API key
         reply = (
-            "Making big decisions can be challenging. Here are some steps you can try: "
+            "I understand that big decisions can feel overwhelming. "
+            "Here are a few steps that might help: "
             "1. Clarify what decision you need to make. "
-            "2. List your options and possible outcomes. "
-            "3. Reflect on your values and priorities. "
-            "4. Consider who might be affected by your decision. "
-            "5. Seek advice if needed. "
-            "Would you like to talk through any of these steps or share more details?"
+            "2. List your main options and possible outcomes. "
+            "3. Reflect on which choice aligns best with your values and goals. "
+            "Would you like to talk through any of these steps or share more about your situation?"
         )
         suggestions = [
             "Clarify your goals",
