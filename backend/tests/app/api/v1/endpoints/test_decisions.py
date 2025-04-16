@@ -78,7 +78,7 @@ def test_create_journal_entry_expected(auth_header):
         "context": "Context info",
         "anticipated_outcomes": "Outcome",
         "values": ["integrity", "growth"],
-        "domain": "career"
+        "domain": "career",
     }
     response = client.post(
         "/api/v1/decisions/journal", json=payload, headers=auth_header
@@ -89,6 +89,7 @@ def test_create_journal_entry_expected(auth_header):
     assert data["user_id"]
     assert isinstance(data["values"], list)
 
+
 def test_create_journal_entry_edge_empty_title(auth_header):
     """Edge: Create a journal entry with empty title."""
     payload = {"title": ""}
@@ -96,6 +97,7 @@ def test_create_journal_entry_edge_empty_title(auth_header):
         "/api/v1/decisions/journal", json=payload, headers=auth_header
     )
     assert response.status_code == 422
+
 
 def test_create_journal_entry_failure_missing_title(auth_header):
     """Failure: Create a journal entry with missing title field."""
@@ -105,13 +107,13 @@ def test_create_journal_entry_failure_missing_title(auth_header):
     )
     assert response.status_code == 422
 
+
 def test_create_journal_entry_failure_unauthenticated():
     """Failure: Create a journal entry without authentication."""
     payload = {"title": "Should fail"}
-    response = client.post(
-        "/api/v1/decisions/journal", json=payload
-    )
+    response = client.post("/api/v1/decisions/journal", json=payload)
     assert response.status_code == 401
+
 
 # --- DecisionChatSession tests ---
 def test_create_decision_session_expected(auth_header):

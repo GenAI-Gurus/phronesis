@@ -21,6 +21,7 @@ class DecisionJournalEntryCreate(BaseModel):
     values: Optional[List[str]] = None
     domain: Optional[str] = None
 
+
 class DecisionJournalEntryOut(BaseModel):
     id: UUID
     user_id: UUID
@@ -55,6 +56,7 @@ def create_decision_journal_entry(
         DecisionJournalEntry: The created entry.
     """
     from app.models.decision import DecisionJournalEntry
+
     entry = DecisionJournalEntry(
         id=uuid.uuid4(),
         user_id=current_user.id,

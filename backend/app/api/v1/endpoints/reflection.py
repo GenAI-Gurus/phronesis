@@ -15,15 +15,23 @@ import os
 
 router = APIRouter()
 
+
 class ReflectionPromptRequest(BaseModel):
     entry_id: UUID
     context: Optional[str] = None
+
 
 class ReflectionPromptResponse(BaseModel):
     prompts: List[str]
     ai_generated: bool = True
 
-@router.post("/prompts/generate", response_model=ReflectionPromptResponse, status_code=200, dependencies=[Depends(get_current_user)])
+
+@router.post(
+    "/prompts/generate",
+    response_model=ReflectionPromptResponse,
+    status_code=200,
+    dependencies=[Depends(get_current_user)],
+)
 def generate_reflection_prompts(
     request: ReflectionPromptRequest,
     db: Session = Depends(get_db),
@@ -45,7 +53,12 @@ def generate_reflection_prompts(
     """
     # Reason: Only allow prompts for entries owned by the user
     from app.models.decision import DecisionJournalEntry
-    entry = db.query(DecisionJournalEntry).filter_by(id=request.entry_id, user_id=current_user.id).first()
+
+    entry = (
+        db.query(DecisionJournalEntry)
+        .filter_by(id=request.entry_id, user_id=current_user.id)
+        .first()
+    )
     if not entry:
         raise HTTPException(status_code=404, detail="Decision journal entry not found")
 
@@ -56,14 +69,13 @@ def generate_reflection_prompts(
         prompts = [
             f"Reflect on why you made the decision: '{entry.title}'.",
             "What values did this decision touch upon?",
-            "How do you feel about the outcome so far?"
+            "How do you feel about the outcome so far?",
         ]
     else:
         # Mock prompts for local/dev/testing
         prompts = [
             f"Reflect on your decision: '{entry.title}'.",
             "What was your main motivation?",
-            "What would you do differently next time?"
+            "What would you do differently next time?",
         ]
     return ReflectionPromptResponse(prompts=prompts, ai_generated=True)
-

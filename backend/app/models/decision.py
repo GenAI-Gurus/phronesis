@@ -44,6 +44,7 @@ class DecisionJournalEntry(Base):
         created_at (datetime): Creation timestamp.
         updated_at (datetime): Last update timestamp.
     """
+
     __tablename__ = "decision_journal_entries"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
@@ -54,5 +55,7 @@ class DecisionJournalEntry(Base):
     domain = Column(String, nullable=True)
     sentiment = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    updated_at = Column(
+        DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
+    )
     user = relationship("User")
