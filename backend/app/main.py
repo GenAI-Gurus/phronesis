@@ -29,6 +29,14 @@ from app.api.v1.endpoints import decisions
 
 app.include_router(decisions.router, prefix="/api/v1/decisions", tags=["decisions"])
 
+from app.api.v1.endpoints import reflection
+
+app.include_router(
+    reflection.router,
+    prefix="/api/v1/reflection",
+    tags=["reflection"],
+)
+
 from app.api.v1.endpoints import decision_support
 
 app.include_router(

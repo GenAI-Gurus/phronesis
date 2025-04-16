@@ -101,17 +101,26 @@
 
 ### Discovered During Work
 - Disabled the `required` attribute on Material UI TextFields in test mode (via `required={import.meta.env.MODE !== 'test'}`) to ensure custom validation logic is exercised and testable in React Testing Library.
+- TODO: Implement Reflection Prompt Generator Endpoint
+- TODO: Integrate OpenAI API for Prompts
+- TODO: Develop UI for Reflection Prompts
+- TODO: Implement Auto Tagging and Categorization
 [x] 20. Develop User Dashboard UI
 
 *Modular dashboard UI implemented in React with Material UI. Includes user summary, recent journals, quick actions, and progress badges. Unit tests cover expected, edge, and failure cases. Ready for backend integration and further enhancements.*
-[ ] 21. Create Decision Journal Data Model
-[ ] 22. Implement Decision Log API Endpoint
-[ ] 23. Build Decision Journal Form UI
-[ ] 24. Integrate Speech-to-Text (Optional)
-[ ] 25. Implement Reflection Prompt Generator Endpoint
-[ ] 26. Integrate OpenAI API for Prompts
-[ ] 27. Develop UI for Reflection Prompts
-[ ] 28. Implement Auto Tagging and Categorization
+[x] 21. Create Decision Journal Data Model
+[x] 22. Implement Decision Journal API endpoints (session/message CRUD, status update)
+[x] 23. Implement Decision Journal Entry creation endpoint
+- TODO: Implement Decision Journal Entry listing and update endpoints
+[ ] 24. Build Decision Journal Form UI
+[ ] 25. Integrate Speech-to-Text (Optional)
+[ ] 26. Implement Reflection Prompt Generator Endpoint
+[ ] 27. Integrate OpenAI API for Prompts
+[ ] 28. Develop UI for Reflection Prompts
+[ ] 29. Implement Auto Tagging and Categorization
+[ ] 30. Develop API for Value Calibration
+[ ] 31. Create Value Calibration Data Model
+[x] 32. Design Value Calibration UI
 [ ] 29. Develop API for Value Calibration
 [ ] 30. Create Value Calibration Data Model
 [x] 31. Design Value Calibration UI
@@ -129,13 +138,38 @@
 [ ] 39. Develop Progress Visualization UI
 [ ] 40. Create Gamification Module (Backend)
 [ ] 41. Develop Gamification UI Elements
-[ ] 42. Set Up Push Notifications
-[ ] 43. Implement Email Notification System
-[ ] 44. Build Analytics & Reporting Module
-[ ] 45. Construct an Admin Dashboard
-[ ] 46. Integrate Application Insights
-[ ] 47. Establish Automated Testing
-[ ] 48. Perform Load and Stress Testing
-[x] 49. Set Up CI/CD Pipeline
+
+---
+
+### Completed Infrastructure & Process Improvements
+- All backend and frontend tests pass locally and in CI (including LLM-powered integration tests with OpenAI GPT-4.1).
+- Test output (OpenAI messages, verdicts) is visible in CI logs for auditability.
+- Test database (test.db) is deleted before every CI run; no legacy UUID errors.
+- Black formatting enforced; code is compliant.
+- .env, test.db, and temp files are gitignored and never committed.
+- OpenAI API key and other secrets managed via GitHub Actions and .env files.
+- Value Calibration and Tension Detector logic fully implemented and tested.
+- Decision Support Chat API with LLM-as-judge integration test.
+- Frontend Value Calibration UI and Chat UI are interactive, validated, and tested.
+- No accidental commits of local/test files; code hygiene is strong.
+
+---
+
+### Next Steps: Azure Deployment
+[ ] 50. Prepare backend for Azure App Service (Dockerfile or Gunicorn/Uvicorn config, environment variables)
+[ ] 51. Prepare frontend for Azure Static Web Apps (ensure build output is ready)
+[ ] 52. Connect Azure Key Vault or App Service settings for secrets (OPENAI_API_KEY, DB connection, etc.)
+[ ] 53. Add GitHub Actions deployment step for backend (azure/webapps-deploy@v3)
+[ ] 54. Add GitHub Actions deployment step for frontend (Azure/static-web-apps-deploy@v1)
+[ ] 55. Test deployment and document URLs for QA
+
+[ ] 56. Set Up Push Notifications
+[ ] 57. Implement Email Notification System
+[ ] 58. Build Analytics & Reporting Module
+[ ] 59. Construct an Admin Dashboard
+[ ] 60. Integrate Application Insights
+[ ] 61. Establish Automated Testing
+[ ] 62. Perform Load and Stress Testing
+[x] 63. Set Up CI/CD Pipeline
     - GitHub Actions is now configured for backend (FastAPI, Poetry) and frontend (React, Vite) CI. See .github/workflows/ci-cd.yml and README.md for details.
-[ ] 50. Deploy MVP to Production
+[ ] 64. Deploy MVP to Production

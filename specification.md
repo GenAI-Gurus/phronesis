@@ -14,6 +14,13 @@ The platform should feel warm and supportive, offering encouragement and empathy
 - Prioritize features that support reflection, journaling, and basic value assessment.
 
 ## CI/CD Status & Contributor Guidance (as of 2025-04-16)
+- LLM-as-judge integration test runs in CI for Decision Support Chat API (uses OpenAI GPT-4.1-nano as a judge).
+- Test output (including OpenAI prompts, answers, and verdicts) is printed in CI logs for transparency.
+- backend/test.db is deleted before every CI run to ensure a clean test environment.
+- Black formatting is enforced for all backend Python code and tests.
+- .env, test.db, and temporary files are gitignored and never committed.
+- All secrets (e.g., OPENAI_API_KEY) are managed via GitHub Actions secrets or .env files (never committed).
+
 - Both backend and frontend CI/CD pipelines (GitHub Actions) are fully passing.
 - **Backend pipeline:** Installs with Poetry, checks formatting with Black, and runs all pytest tests with `PYTHONPATH=.`. Contributors must ensure code is formatted and all tests pass before merging.
 - **Frontend pipeline:** Installs Node dependencies, lints with ESLint, runs Vitest tests, and builds with Vite. All source files (especially `index.html` and new components/pages) must be tracked by git.

@@ -70,6 +70,49 @@ def auth_header():
     return {"Authorization": f"Bearer {token}"}
 
 
+# --- DecisionJournalEntry tests ---
+def test_create_journal_entry_expected(auth_header):
+    """Expected: Create a journal entry with valid data."""
+    payload = {
+        "title": "My Decision",
+        "context": "Context info",
+        "anticipated_outcomes": "Outcome",
+        "values": ["integrity", "growth"],
+        "domain": "career"
+    }
+    response = client.post(
+        "/api/v1/decisions/journal", json=payload, headers=auth_header
+    )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["title"] == "My Decision"
+    assert data["user_id"]
+    assert isinstance(data["values"], list)
+
+def test_create_journal_entry_edge_empty_title(auth_header):
+    """Edge: Create a journal entry with empty title."""
+    payload = {"title": ""}
+    response = client.post(
+        "/api/v1/decisions/journal", json=payload, headers=auth_header
+    )
+    assert response.status_code == 422
+
+def test_create_journal_entry_failure_missing_title(auth_header):
+    """Failure: Create a journal entry with missing title field."""
+    payload = {"context": "Missing title"}
+    response = client.post(
+        "/api/v1/decisions/journal", json=payload, headers=auth_header
+    )
+    assert response.status_code == 422
+
+def test_create_journal_entry_failure_unauthenticated():
+    """Failure: Create a journal entry without authentication."""
+    payload = {"title": "Should fail"}
+    response = client.post(
+        "/api/v1/decisions/journal", json=payload
+    )
+    assert response.status_code == 401
+
 # --- DecisionChatSession tests ---
 def test_create_decision_session_expected(auth_header):
     """Expected: Create a session with valid data."""

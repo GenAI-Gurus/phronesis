@@ -14,6 +14,65 @@ import datetime
 router = APIRouter()
 
 
+class DecisionJournalEntryCreate(BaseModel):
+    title: constr(min_length=1)
+    context: Optional[str] = None
+    anticipated_outcomes: Optional[str] = None
+    values: Optional[List[str]] = None
+    domain: Optional[str] = None
+
+class DecisionJournalEntryOut(BaseModel):
+    id: UUID
+    user_id: UUID
+    title: str
+    context: Optional[str]
+    anticipated_outcomes: Optional[str]
+    values: Optional[List[str]]
+    domain: Optional[str]
+    sentiment: Optional[str]
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+
+    class Config:
+        orm_mode = True
+
+
+@router.post("/journal", response_model=DecisionJournalEntryOut, status_code=201)
+def create_decision_journal_entry(
+    entry_in: DecisionJournalEntryCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Create a new decision journal entry for the authenticated user.
+
+    Args:
+        entry_in (DecisionJournalEntryCreate): Journal entry data.
+        db (Session): SQLAlchemy session dependency.
+        current_user (User): The authenticated user.
+
+    Returns:
+        DecisionJournalEntry: The created entry.
+    """
+    from app.models.decision import DecisionJournalEntry
+    entry = DecisionJournalEntry(
+        id=uuid.uuid4(),
+        user_id=current_user.id,
+        title=entry_in.title,
+        context=entry_in.context,
+        anticipated_outcomes=entry_in.anticipated_outcomes,
+        values=entry_in.values,
+        domain=entry_in.domain,
+        sentiment=None,
+        created_at=datetime.datetime.utcnow(),
+        updated_at=datetime.datetime.utcnow(),
+    )
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return entry
+
+
 class DecisionMessageCreate(BaseModel):
     content: str
     sender: str = Field(..., pattern="^(user|ai)$")
@@ -174,6 +233,18 @@ def update_decision_session(
 ):
     """
     Update a decision chat session (status, summary, insights, completed_at).
+
+    Args:
+        session_id (str): The session UUID (as string).
+        session_update (DecisionSessionUpdate): The update payload.
+        db (Session): SQLAlchemy session dependency.
+        current_user (User): The authenticated user.
+
+    Returns:
+        DecisionChatSession: The updated session object.
+
+    Raises:
+        HTTPException: If session_id is invalid, session not found, or status is invalid.
     """
     import uuid
 
@@ -189,7 +260,7 @@ def update_decision_session(
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     if session_update.status:
-        # Reason: Validate status against enum
+        # Reason: Validate status against enum (only allow valid SessionStatus values)
         from app.models.decision import SessionStatus
 
         try:
