@@ -10,6 +10,8 @@ from app.core.security import get_current_user
 
 
 import uuid
+
+
 class DummyUser:
     id = uuid.uuid4()
     email = "test@example.com"

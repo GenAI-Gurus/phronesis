@@ -34,6 +34,7 @@ def test_checkin_edge_empty_snapshot():
 from sqlalchemy.exc import IntegrityError
 from app.db.session import SessionLocal
 
+
 def test_checkin_failure_missing_user_id():
     checkin = ValueCalibrationCheckin(
         id=uuid.uuid4(),
