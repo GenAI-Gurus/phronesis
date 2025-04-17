@@ -49,36 +49,45 @@ jobs:
 
   build-and-deploy:
     needs: test
-    defaults:
-      run:
-        working-directory: backend
     runs-on: ubuntu-latest
     env:
       AZURE_WEBAPP_NAME: phronesis-backend-app
-      AZURE_WEBAPP_PACKAGE_PATH: backend
-      DOCKERFILE_PATH: backend/Dockerfile
+      AZURE_RESOURCE_GROUP: phronesis-rg
       PYTHON_VERSION: '3.11'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Login to Azure
+      - name: Build Docker image
+        run: docker build -t ghcr.io/${{ github.repository }}/phronesis-backend:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: docker push ghcr.io/${{ github.repository }}/phronesis-backend:${{ github.sha }}
+
+      - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set App Service to new Docker image from GHCR
+        run: |
+          az webapp config container set \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --docker-custom-image-name ghcr.io/${{ github.repository }}/phronesis-backend:${{ github.sha }} \
+            --docker-registry-server-url https://ghcr.io \
+            --docker-registry-server-user ${{ github.actor }} \
+            --docker-registry-server-password ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image to Azure Container Registry (if using ACR)
         if: false  # Skip if deploying directly from repo
         run: |
           echo "Add ACR build/push steps here if needed."
 
-      - name: Deploy to Azure Web App (Docker)
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
