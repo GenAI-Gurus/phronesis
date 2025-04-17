@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: "sqlite:///:memory:"
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
       - name: Checkout code
