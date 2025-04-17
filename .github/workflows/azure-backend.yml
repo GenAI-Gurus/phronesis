@@ -1,4 +1,17 @@
-name: Deploy Backend to Azure App Service (Docker)
+# Azure Backend Deployment Workflow for Phronesis
+#
+# This workflow handles backend deployment to Azure App Service (Docker) ONLY.
+# It is triggered on push to main branch or manual dispatch.
+#
+# All CI (lint, test, build) steps are handled in ci.yml and must pass before deployment.
+# This workflow assumes code is production-ready and only manages deployment.
+#
+# Required secrets:
+#   - AZURE_WEBAPP_PUBLISH_PROFILE (for publish profile deployment)
+#   - AZURE_CREDENTIALS (optional, for service principal login)
+#
+# Frontend deployment is managed separately.
+name: Azure Backend Deployment
 
 on:
   push:
@@ -34,7 +47,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     env:
-      AZURE_WEBAPP_NAME: phronesis-backend-app  # <-- CHANGE THIS
+      AZURE_WEBAPP_NAME: phronesis-backend-app
       AZURE_WEBAPP_PACKAGE_PATH: backend
       DOCKERFILE_PATH: backend/Dockerfile
       PYTHON_VERSION: '3.11'
