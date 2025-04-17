@@ -59,14 +59,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set image name (lowercase)
+        id: vars
+        run: |
+          IMAGE_NAME="ghcr.io/${GITHUB_REPOSITORY,,}/phronesis-backend:${GITHUB_SHA}"
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/phronesis-backend:${{ github.sha }} .
+        run: docker build -t ${{ steps.vars.outputs.image_name }} .
 
       - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository }}/phronesis-backend:${{ github.sha }}
+        run: docker push ${{ steps.vars.outputs.image_name }}
 
       - name: Azure Login
         uses: azure/login@v2
@@ -78,7 +84,7 @@ jobs:
           az webapp config container set \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --docker-custom-image-name ghcr.io/${{ github.repository }}/phronesis-backend:${{ github.sha }} \
+            --docker-custom-image-name ${{ steps.vars.outputs.image_name }} \
             --docker-registry-server-url https://ghcr.io \
             --docker-registry-server-user ${{ github.actor }} \
             --docker-registry-server-password ${{ secrets.GITHUB_TOKEN }}
