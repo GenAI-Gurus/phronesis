@@ -83,18 +83,6 @@ jobs:
             --docker-registry-server-user ${{ github.actor }} \
             --docker-registry-server-password ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image to Azure Container Registry (if using ACR)
-        if: false  # Skip if deploying directly from repo
-        run: |
-          echo "Add ACR build/push steps here if needed."
-
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: 'DOCKER|${{ github.repository }}:latest'
-          # If using ACR, set images: '<youracr>.azurecr.io/phronesis-backend:latest'
-
       - name: Post-deployment - Run Alembic migrations
         run: |
           # SSH into the app or use Azure CLI to run migrations if needed
