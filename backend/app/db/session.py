@@ -7,7 +7,11 @@ from sqlalchemy.orm import sessionmaker, Session
 import os
 
 # Reason: Use DATABASE_URL from environment or fallback for local development
-database_url = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+import os
+
+TEST_DB_PATH = os.path.abspath("./test.db")
+database_url = os.getenv("DATABASE_URL", f"sqlite:///{TEST_DB_PATH}")
+print(f"*** Using database_url: {database_url}")
 
 engine = create_engine(
     database_url,

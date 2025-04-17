@@ -54,12 +54,23 @@ def generate_reflection_prompts(
     # Reason: Only allow prompts for entries owned by the user
     from app.models.decision import DecisionJournalEntry
 
+    # Debug: print all entries for the user
+    all_entries = (
+        db.query(DecisionJournalEntry).filter_by(user_id=str(current_user.id)).all()
+    )
+    print(
+        f"[DEBUG] generate_reflection_prompts: entry_id={request.entry_id}, user_id={current_user.id}, all_entries={[{'id': e.id, 'user_id': e.user_id} for e in all_entries]}"
+    )
     entry = (
         db.query(DecisionJournalEntry)
-        .filter_by(id=request.entry_id, user_id=current_user.id)
+        .filter_by(id=str(request.entry_id), user_id=str(current_user.id))
         .first()
     )
+    print(f"[DEBUG] generate_reflection_prompts: entry query result: {entry}")
     if not entry:
+        print(
+            f"[DEBUG] Decision journal entry not found for id={request.entry_id}, user_id={current_user.id}"
+        )
         raise HTTPException(status_code=404, detail="Decision journal entry not found")
 
     # Reason: Integrate with OpenAI API if configured, otherwise mock

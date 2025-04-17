@@ -7,7 +7,31 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "sqlite:///:memory:"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --no-root
+
+      - name: Run tests
+        run: PYTHONPATH=. poetry run pytest --maxfail=1 --disable-warnings --tb=short -s
+
   build-and-deploy:
+    needs: test
     runs-on: ubuntu-latest
     env:
       AZURE_WEBAPP_NAME: phronesis-backend-app  # <-- CHANGE THIS

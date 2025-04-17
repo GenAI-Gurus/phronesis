@@ -17,7 +17,7 @@ class MessageType(enum.Enum):
 
 class DecisionChatMessage(Base):
     __tablename__ = "decision_chat_messages"
-    id = Column(String(36), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     session_id = Column(
         String(36), ForeignKey("decision_chat_sessions.id"), nullable=False
     )

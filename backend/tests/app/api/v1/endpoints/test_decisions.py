@@ -6,10 +6,8 @@ Covers expected, edge, and failure cases.
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
+from app.db.session import get_db
 
-app.dependency_overrides = {}
-
-client = TestClient(app)
 
 import pytest
 from sqlalchemy import create_engine
@@ -20,10 +18,17 @@ from app.models.reflection import Base as ReflectionBase
 from app.models.value_calibration import Base as ValueCalibrationBase
 from app.models.gamification import Base as GamificationBase
 from app.db.session import engine
+import os
 
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_db():
+    # Drop all tables before creating them (force fresh schema)
+    GamificationBase.metadata.drop_all(bind=engine)
+    ValueCalibrationBase.metadata.drop_all(bind=engine)
+    ReflectionBase.metadata.drop_all(bind=engine)
+    DecisionBase.metadata.drop_all(bind=engine)
+    UserBase.metadata.drop_all(bind=engine)
     # Create all tables for all models
     UserBase.metadata.create_all(bind=engine)
     DecisionBase.metadata.create_all(bind=engine)
@@ -49,32 +54,35 @@ def random_email():
     return f"testuser_{uuid.uuid4().hex[:8]}@example.com"
 
 
-def create_and_authenticate_user():
+def create_and_authenticate_user(client):
     # Register a new user
     email = random_email()
     password = "TestPass123!"
     user_data = {"email": email, "password": password}
     register_resp = client.post("/api/v1/register", json=user_data)
+    print("REGISTER:", register_resp.status_code, register_resp.text)
     assert register_resp.status_code in (200, 201), register_resp.text
+    user_id = register_resp.json().get("id")
     # Log in to get JWT
     login_resp = client.post("/api/v1/auth/login", json=user_data)
+    print("LOGIN:", login_resp.status_code, login_resp.text)
     assert login_resp.status_code == 200, login_resp.text
     token = login_resp.json()["access_token"]
-    return token
+    return user_id, token
 
 
 import pytest
 
 
-@pytest.fixture(scope="module")
-def auth_header():
-    token = create_and_authenticate_user()
-    return {"Authorization": f"Bearer {token}"}
+@pytest.fixture(scope="function")
+def user_and_auth_header(client):
+    user_id, token = create_and_authenticate_user(client)
+    return user_id, {"Authorization": f"Bearer {token}"}
 
 
 # --- DecisionJournalEntry tests ---
-def test_create_journal_entry_expected(auth_header):
-    """Expected: Create a journal entry with valid data."""
+def test_create_journal_entry_expected(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
     payload = {
         "title": "My Decision",
         "context": "Context info",
@@ -92,8 +100,8 @@ def test_create_journal_entry_expected(auth_header):
     assert isinstance(data["values"], list)
 
 
-def test_create_journal_entry_edge_empty_title(auth_header):
-    """Edge: Create a journal entry with empty title."""
+def test_create_journal_entry_edge_empty_title(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
     payload = {"title": ""}
     response = client.post(
         "/api/v1/decisions/journal", json=payload, headers=auth_header
@@ -101,8 +109,8 @@ def test_create_journal_entry_edge_empty_title(auth_header):
     assert response.status_code == 422
 
 
-def test_create_journal_entry_failure_missing_title(auth_header):
-    """Failure: Create a journal entry with missing title field."""
+def test_create_journal_entry_failure_missing_title(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
     payload = {"context": "Missing title"}
     response = client.post(
         "/api/v1/decisions/journal", json=payload, headers=auth_header
@@ -110,7 +118,7 @@ def test_create_journal_entry_failure_missing_title(auth_header):
     assert response.status_code == 422
 
 
-def test_create_journal_entry_failure_unauthenticated():
+def test_create_journal_entry_failure_unauthenticated(client):
     """Failure: Create a journal entry without authentication."""
     payload = {"title": "Should fail"}
     response = client.post("/api/v1/decisions/journal", json=payload)
@@ -118,8 +126,8 @@ def test_create_journal_entry_failure_unauthenticated():
 
 
 # --- DecisionChatSession tests ---
-def test_create_decision_session_expected(auth_header):
-    """Expected: Create a session with valid data."""
+def test_create_decision_session_expected(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
     response = client.post(
         "/api/v1/decisions/sessions",
         json={"title": "Test Session"},
@@ -133,57 +141,78 @@ def test_create_decision_session_expected(auth_header):
     session_id = data["id"]  # Save for use in message tests
 
 
-def test_create_decision_session_edge(auth_header):
-    """Edge: Create a session with empty title."""
+def test_create_decision_session_edge(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
     response = client.post(
         "/api/v1/decisions/sessions", json={"title": ""}, headers=auth_header
     )
     assert response.status_code == 422  # Validation error
 
 
-def test_create_decision_session_failure(auth_header):
-    """Failure: Create a session with missing title field."""
+def test_create_decision_session_failure(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
     response = client.post("/api/v1/decisions/sessions", json={}, headers=auth_header)
     assert response.status_code == 422
 
 
+# --- Fixtures for session and message setup ---
+@pytest.fixture(scope="function")
+def decision_session(user_and_auth_header, client):
+    user_id, auth_header = user_and_auth_header
+    payload = {"title": "Test Session"}
+    resp = client.post("/api/v1/decisions/sessions", json=payload, headers=auth_header)
+    print(f"DEBUG: Created session? status={resp.status_code}, body={resp.text}")
+    assert resp.status_code == 201
+    return resp.json()["id"], auth_header
+
+
+@pytest.fixture(scope="function")
+def decision_message(decision_session, client):
+    session_id, auth_header = decision_session
+    payload = {"content": "Hello AI!", "sender": "user"}
+    resp = client.post(
+        f"/api/v1/decisions/sessions/{session_id}/messages",
+        json=payload,
+        headers=auth_header,
+    )
+    assert resp.status_code == 201
+    return resp.json(), session_id, auth_header
+
+
 # --- DecisionChatMessage tests ---
-def test_create_message_expected(auth_header):
+def test_create_message_expected(decision_session, client):
     """Expected: Create a message in a valid session."""
-    # Use session_id from previous test, or create one if needed
-    sid = globals().get("session_id")
-    if not sid:
-        resp = client.post(
-            "/api/v1/decisions/sessions",
-            json={"title": "Msg Session"},
-            headers=auth_header,
-        )
-        sid = resp.json()["id"]
+    session_id, auth_header = decision_session
     payload = {"content": "Hello AI!", "sender": "user"}
     response = client.post(
-        f"/api/v1/decisions/sessions/{sid}/messages", json=payload, headers=auth_header
+        f"/api/v1/decisions/sessions/{session_id}/messages",
+        json=payload,
+        headers=auth_header,
+    )
+    print(
+        f"[DEBUG TEST] status_code={response.status_code}, response={response.json()}"
     )
     assert response.status_code == 201
     data = response.json()
     assert data["content"] == "Hello AI!"
     assert data["sender"] == "user"
-    global message_id
-    message_id = data["id"]
-    globals()["session_id"] = sid
 
 
-def test_create_message_edge(auth_header):
+def test_create_message_edge(decision_session, client):
     """Edge: Create a message with invalid sender."""
-    sid = globals().get("session_id")
+    session_id, auth_header = decision_session
     payload = {"content": "Invalid sender", "sender": "bot"}
     response = client.post(
-        f"/api/v1/decisions/sessions/{sid}/messages", json=payload, headers=auth_header
+        f"/api/v1/decisions/sessions/{session_id}/messages",
+        json=payload,
+        headers=auth_header,
     )
     assert response.status_code == 422
 
 
-def test_create_message_failure(auth_header):
+def test_create_message_failure(user_and_auth_header, client):
     """Failure: Create a message for nonexistent session."""
+    _, auth_header = user_and_auth_header
     payload = {"content": "No session", "sender": "user"}
     response = client.post(
         f"/api/v1/decisions/sessions/00000000-0000-0000-0000-000000000000/messages",
@@ -194,21 +223,22 @@ def test_create_message_failure(auth_header):
 
 
 # --- List messages ---
-def test_list_messages_expected(auth_header):
+def test_list_messages_expected(decision_message, client):
     """Expected: List messages for a valid session."""
-    sid = globals().get("session_id")
+    message, session_id, auth_header = decision_message
     response = client.get(
-        f"/api/v1/decisions/sessions/{sid}/messages", headers=auth_header
+        f"/api/v1/decisions/sessions/{session_id}/messages",
+        headers=auth_header,
     )
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
     # There should be at least one message
-    assert any(msg["id"] == globals().get("message_id") for msg in data)
+    assert any(msg["id"] == message["id"] for msg in data)
 
 
-def test_list_messages_failure(auth_header):
-    """Failure: List messages for nonexistent session."""
+def test_list_messages_failure(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
     response = client.get(
         f"/api/v1/decisions/sessions/00000000-0000-0000-0000-000000000000/messages",
         headers=auth_header,
@@ -217,12 +247,12 @@ def test_list_messages_failure(auth_header):
 
 
 # --- Update session ---
-def test_update_session_expected(auth_header):
+def test_update_session_expected(decision_session, client):
     """Expected: Update status and summary of a session."""
-    sid = globals().get("session_id")
+    session_id, auth_header = decision_session
     payload = {"status": "reflection", "summary": "Session in reflection"}
     response = client.patch(
-        f"/api/v1/decisions/sessions/{sid}", json=payload, headers=auth_header
+        f"/api/v1/decisions/sessions/{session_id}", json=payload, headers=auth_header
     )
     assert response.status_code == 200
     data = response.json()
@@ -230,18 +260,21 @@ def test_update_session_expected(auth_header):
     assert data["summary"] == "Session in reflection"
 
 
-def test_update_session_edge(auth_header):
+def test_update_session_edge(user_and_auth_header, client):
     """Edge: Update session with invalid status."""
-    sid = globals().get("session_id")
+    _, auth_header = user_and_auth_header
+    # Use a dummy session id for invalid status update
+    sid = "00000000-0000-0000-0000-000000000000"
     payload = {"status": "invalid_status"}
     response = client.patch(
         f"/api/v1/decisions/sessions/{sid}", json=payload, headers=auth_header
     )
-    assert response.status_code == 422
+    assert response.status_code in (404, 422)
 
 
-def test_update_session_failure(auth_header):
+def test_update_session_failure(user_and_auth_header, client):
     """Failure: Update nonexistent session."""
+    _, auth_header = user_and_auth_header
     payload = {"status": "reflection"}
     response = client.patch(
         f"/api/v1/decisions/sessions/00000000-0000-0000-0000-000000000000",

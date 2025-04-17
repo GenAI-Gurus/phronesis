@@ -29,7 +29,7 @@ try:
 except ImportError:
     openai = None
 
-OPENAI_MODEL = "gpt-4-1106-preview"  # GPT-4.1 model
+OPENAI_MODEL = "gpt-4.1"  # GPT-4.1 model
 
 
 @router.post("/chat", response_model=DecisionSupportResponse)
@@ -38,7 +38,7 @@ def decision_support_chat(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Decision support chat using OpenAI GPT-4.1 (gpt-4-1106-preview).
+    Decision support chat using OpenAI GPT-4.1 (gpt-4.1).
     Falls back to mock reply if OpenAI fails or not configured.
     """
     if not req.messages or req.messages[-1].role != "user":

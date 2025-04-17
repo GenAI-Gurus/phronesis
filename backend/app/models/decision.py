@@ -17,7 +17,7 @@ class SessionStatus(enum.Enum):
 
 class DecisionChatSession(Base):
     __tablename__ = "decision_chat_sessions"
-    id = Column(String(36), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     title = Column(String, nullable=False)  # Added title column
     started_at = Column(DateTime, default=datetime.datetime.utcnow)
@@ -46,7 +46,7 @@ class DecisionJournalEntry(Base):
     """
 
     __tablename__ = "decision_journal_entries"
-    id = Column(String(36), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     title = Column(String, nullable=False)
     context = Column(String, nullable=True)

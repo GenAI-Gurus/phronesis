@@ -59,13 +59,9 @@ def get_current_user(
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception
-        try:
-            user_uuid = uuid.UUID(user_id)
-        except (ValueError, AttributeError):
-            raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = db.query(User).filter(User.id == user_uuid).first()
+    user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise credentials_exception
     return user

@@ -58,8 +58,8 @@ def create_decision_journal_entry(
     from app.models.decision import DecisionJournalEntry
 
     entry = DecisionJournalEntry(
-        id=uuid.uuid4(),
-        user_id=current_user.id,
+        id=str(uuid.uuid4()),
+        user_id=str(current_user.id),
         title=entry_in.title,
         context=entry_in.context,
         anticipated_outcomes=entry_in.anticipated_outcomes,
@@ -104,8 +104,8 @@ def create_decision_session(
     current_user: User = Depends(get_current_user),
 ):
     session = DecisionChatSession(
-        id=uuid.uuid4(),
-        user_id=current_user.id,
+        id=str(uuid.uuid4()),
+        user_id=str(current_user.id),
         title=session_in.title,
         started_at=datetime.datetime.utcnow(),
         status="context_gathering",
@@ -163,18 +163,33 @@ def create_decision_message(
     """
     import uuid
 
+    print(
+        f"[DEBUG] create_decision_message: session_id={session_id}, user_id={getattr(current_user, 'id', None)}"
+    )
     # Convert session_id to UUID
     try:
         session_uuid = uuid.UUID(session_id)
     except (ValueError, AttributeError):
+        print("[DEBUG] Invalid session_id format")
         raise HTTPException(status_code=422, detail="Invalid session_id format")
+    # Print all sessions for current user
+    all_sessions = (
+        db.query(DecisionChatSession).filter_by(user_id=str(current_user.id)).all()
+    )
+    print(
+        f"[DEBUG] create_decision_message: all sessions for user {current_user.id}: {[{'id': s.id, 'user_id': s.user_id} for s in all_sessions]}"
+    )
     # Check session ownership
     session = (
         db.query(DecisionChatSession)
-        .filter_by(id=session_uuid, user_id=current_user.id)
+        .filter_by(id=str(session_uuid), user_id=str(current_user.id))
         .first()
     )
+    print(f"[DEBUG] create_decision_message: session query result: {session}")
     if not session:
+        print(
+            f"[DEBUG] Session not found for id={session_id}, user_id={getattr(current_user, 'id', None)}"
+        )
         raise HTTPException(status_code=404, detail="Session not found")
     # Reason: Enum conversion for sender
     from app.models.reflection import MessageType
@@ -182,10 +197,11 @@ def create_decision_message(
     try:
         sender_enum = MessageType[message_in.sender]
     except KeyError:
+        print(f"[DEBUG] Invalid sender type: {message_in.sender}")
         raise HTTPException(status_code=422, detail="Invalid sender type")
     message = DecisionChatMessage(
-        id=uuid.uuid4(),
-        session_id=session_uuid,
+        id=str(uuid.uuid4()),
+        session_id=str(session_uuid),
         sender=sender_enum,
         content=message_in.content,
         created_at=datetime.datetime.utcnow(),
@@ -193,6 +209,7 @@ def create_decision_message(
     db.add(message)
     db.commit()
     db.refresh(message)
+    print(f"[DEBUG] Message created: {message}")
     return message
 
 
@@ -213,14 +230,14 @@ def list_decision_messages(
         raise HTTPException(status_code=422, detail="Invalid session_id format")
     session = (
         db.query(DecisionChatSession)
-        .filter_by(id=session_uuid, user_id=current_user.id)
+        .filter_by(id=str(session_uuid), user_id=str(current_user.id))
         .first()
     )
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     return (
         db.query(DecisionChatMessage)
-        .filter_by(session_id=session_uuid)
+        .filter_by(session_id=str(session_uuid))
         .order_by(DecisionChatMessage.created_at)
         .all()
     )
@@ -250,16 +267,31 @@ def update_decision_session(
     """
     import uuid
 
+    print(
+        f"[DEBUG] update_decision_session: session_id={session_id}, user_id={getattr(current_user, 'id', None)}"
+    )
     try:
         session_uuid = uuid.UUID(session_id)
     except (ValueError, AttributeError):
+        print("[DEBUG] Invalid session_id format")
         raise HTTPException(status_code=422, detail="Invalid session_id format")
+    # Print all sessions for current user
+    all_sessions = (
+        db.query(DecisionChatSession).filter_by(user_id=str(current_user.id)).all()
+    )
+    print(
+        f"[DEBUG] update_decision_session: all sessions for user {current_user.id}: {[{'id': s.id, 'user_id': s.user_id} for s in all_sessions]}"
+    )
     session = (
         db.query(DecisionChatSession)
-        .filter_by(id=session_uuid, user_id=current_user.id)
+        .filter_by(id=str(session_uuid), user_id=str(current_user.id))
         .first()
     )
+    print(f"[DEBUG] update_decision_session: session query result: {session}")
     if not session:
+        print(
+            f"[DEBUG] Session not found for id={session_id}, user_id={getattr(current_user, 'id', None)}"
+        )
         raise HTTPException(status_code=404, detail="Session not found")
     if session_update.status:
         # Reason: Validate status against enum (only allow valid SessionStatus values)
@@ -268,6 +300,7 @@ def update_decision_session(
         try:
             session.status = SessionStatus[session_update.status]
         except KeyError:
+            print(f"[DEBUG] Invalid status value: {session_update.status}")
             raise HTTPException(status_code=422, detail="Invalid status value")
     if session_update.summary is not None:
         session.summary = session_update.summary
@@ -277,6 +310,7 @@ def update_decision_session(
         session.completed_at = session_update.completed_at
     db.commit()
     db.refresh(session)
+    print(f"[DEBUG] update_decision_session: updated session: {session}")
     return session
 
 

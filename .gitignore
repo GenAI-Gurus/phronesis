@@ -12,6 +12,7 @@ build/
 .venv
 venv/
 ENV/
+.pytest_cache/
 #.env.*
 
 # Node
