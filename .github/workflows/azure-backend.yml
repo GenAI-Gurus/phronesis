@@ -61,7 +61,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Poetry
-        run: pip install poetry
+        run: pip install "poetry>=1.6.0,<2.0.0"
 
       - name: Check lockfile sync
         run: |
