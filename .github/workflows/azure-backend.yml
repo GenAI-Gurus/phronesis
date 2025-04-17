@@ -21,6 +21,9 @@ on:
 
 jobs:
   test:
+    defaults:
+      run:
+        working-directory: backend
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: "sqlite:///:memory:"
@@ -45,6 +48,9 @@ jobs:
 
   build-and-deploy:
     needs: test
+    defaults:
+      run:
+        working-directory: backend
     runs-on: ubuntu-latest
     env:
       AZURE_WEBAPP_NAME: phronesis-backend-app
