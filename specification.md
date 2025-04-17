@@ -30,6 +30,73 @@ The platform should feel warm and supportive, offering encouragement and empathy
   - If Black fails, run `poetry run black app tests` and commit.
 - See README.md files for more troubleshooting and pipeline details.
 
+---
+
+## Backend Deployment to Azure App Service (Docker, GHCR)
+
+### Overview
+The backend is deployed to Azure App Service using a custom Docker image, which is built and pushed to GitHub Container Registry (GHCR) via GitHub Actions. This process ensures secure, production-grade deployment with best practices for secret management and image hygiene.
+
+### Prerequisites
+- **Azure App Service** instance created (Linux, Docker).
+- **GitHub Container Registry (GHCR)** used for storing production images (see workflow).
+- Required secrets set in Azure App Service Configuration:
+  - `DATABASE_URL`
+  - `OPENAI_API_KEY`
+  - Any other environment variables needed for production.
+
+### Deployment Steps
+1. **Build and Push Docker Image**
+   - The GitHub Actions workflow ([.github/workflows/azure-backend.yml](.github/workflows/azure-backend.yml)) builds the Docker image and pushes it to GHCR at `ghcr.io/genai-gurus/phronesis/phronesis-backend:<sha>`.
+   - The Dockerfile uses Poetry for dependency management and installs all production dependencies.
+
+2. **Configure App Service**
+   - Set environment variables in the Azure Portal under Configuration > Application settings.
+   - Never store secrets in the image or repository; always inject at runtime.
+
+3. **Update .dockerignore**
+   - `.dockerignore` excludes files such as `.env`, `secrets.*`, `*.key`, `*.pem` to prevent accidental leakage of secrets.
+
+4. **Production Dependencies**
+   - `gunicorn` must be included in `[tool.poetry.dependencies]` in `pyproject.toml` to ensure the container can start with the correct command.
+   - After adding new dependencies, always run `poetry lock` and commit the updated lock file.
+
+5. **Run Database Migrations**
+   - After deployment, run Alembic migrations on your production database:
+     ```sh
+     poetry run alembic upgrade head
+     ```
+
+6. **Test the Deployment**
+   - Access the app at `https://phronesis-backend-app.azurewebsites.net`.
+   - Optionally, test `/docs` or `/health` endpoints for confirmation.
+
+### Security Best Practices
+- **No secrets in Docker images:** All secrets are injected at runtime via environment variables.
+- **.dockerignore:** Ensures sensitive files are never included in the build context.
+- **Public images:** If publishing images publicly on GHCR, ensure no secrets or sensitive files are present in the image.
+
+### Troubleshooting
+- **Container fails to start with `gunicorn: executable file not found`:**
+  - Ensure `gunicorn` is in production dependencies, not just dev.
+  - Run `poetry lock` and redeploy.
+- **Application Error page on Azure:**
+  - Check Azure Log Stream for startup errors.
+  - Confirm all required environment variables are set.
+  - Test the image locally with:
+    ```sh
+    docker run -e OPENAI_API_KEY=yourkey -e DATABASE_URL=yourdb -p 8000:8000 ghcr.io/genai-gurus/phronesis/phronesis-backend:<sha>
+    ```
+- **CI/CD Fails:**
+  - Ensure all tests pass and code is formatted.
+  - Check that all dependencies are included in `pyproject.toml` and locked.
+
+### References
+- See [backend/README.md](backend/README.md) for detailed backend and Docker instructions.
+- See Azure App Service [official docs](https://learn.microsoft.com/en-us/azure/app-service/quickstart-custom-container?tabs=python&pivots=container-linux).
+
+---
+
 ## Frontend Authentication & Validation (as of 2025-04-16)
 
 ## Tension Detector Logic

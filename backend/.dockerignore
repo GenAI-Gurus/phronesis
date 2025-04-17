@@ -18,3 +18,8 @@ htmlcov/
 .vscode
 .idea
 .DS_Store
+
+# Ignore generic secret and key files
+secrets.*
+*.key
+*.pem

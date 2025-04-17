@@ -6,8 +6,14 @@
 
 FROM python:3.11-slim
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y build-essential curl && rm -rf /var/lib/apt/lists/*
+# Install system dependencies and ODBC drivers for pyodbc/MS SQL
+RUN apt-get update && \
+    apt-get install -y build-essential curl gcc g++ gnupg2 unixodbc-dev && \
+    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/debian/$(. /etc/os-release; echo $VERSION_ID)/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql18 && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
 ENV POETRY_VERSION=1.7.1
