@@ -30,12 +30,16 @@ jobs:
           python-version: '3.11'
       - name: Install Poetry
         run: pip install poetry
-      - name: Install dependencies
-        # Use --no-root because this project is not a Poetry package (no installable backend module)
-        run: poetry install --no-root
+      - name: Install Poetry
+        run: pip install poetry
+
       - name: Check lockfile sync
         run: |
           poetry lock --check || (echo 'poetry.lock is out of sync with pyproject.toml. Run "poetry lock" and commit the updated lock file.' && exit 1)
+
+      - name: Install dependencies
+        # Use --no-root because this project is not a Poetry package (no installable backend module)
+        run: poetry install --no-root
 
       - name: Lint (black)
         run: poetry run black --check app tests
