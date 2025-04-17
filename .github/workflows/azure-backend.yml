@@ -69,7 +69,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build Docker image
-        run: docker build -t ${{ steps.vars.outputs.image_name }} .
+        run: docker build -f backend/Dockerfile -t ${{ steps.vars.outputs.image_name }} backend
 
       - name: Push Docker image
         run: docker push ${{ steps.vars.outputs.image_name }}
