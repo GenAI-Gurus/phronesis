@@ -8,7 +8,7 @@ FROM python:3.11-slim
 
 # Install system dependencies and ODBC drivers for pyodbc/MS SQL
 RUN apt-get update && \
-    apt-get install -y build-essential curl gcc g++ gnupg2 unixodbc-dev && \
+    apt-get install -y build-essential curl gcc g++ gnupg2 unixodbc unixodbc-dev && \
     mkdir -p /etc/apt/keyrings && \
     curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/keyrings/microsoft.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/mssql-release.list && \
