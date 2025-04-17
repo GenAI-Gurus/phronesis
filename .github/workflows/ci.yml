@@ -29,9 +29,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install Poetry
-        run: pip install poetry
-      - name: Install Poetry
-        run: pip install poetry
+        run: pip install "poetry>=1.6.0,<2.0.0"
 
       - name: Check lockfile sync
         run: |
