@@ -3,7 +3,7 @@
 This directory contains Infrastructure-as-Code (IaC) templates for deploying the Phronesis backend to Azure. All resources are designed for minimal fixed cost and easy scaling.
 
 ## Resources
-- **App Service:** Linux, Python 3.11, minimal instance size, autoscale
+- **App Service:** Linux, Docker Container (Web App for Containers), minimal instance size, autoscale
 - **SQL Database:** Basic/serverless tier
 - **Blob Storage:** Pay-as-you-go
 - **Key Vault:** For secrets
@@ -23,13 +23,15 @@ This directory contains Infrastructure-as-Code (IaC) templates for deploying the
    ```
 
 3. **Deploy resources**
-   - App Service:
+   - App Service (Docker):
      ```sh
      az deployment group create \
        --resource-group phronesis-rg \
        --template-file app_service.bicep \
-       --parameters appServicePlanName=phronesis-appservice-plan webAppName=phronesis-backend-app
+       --parameters appServicePlanName=phronesis-appservice-plan webAppName=phronesis-backend-app dockerImage=phronesis-backend:latest
      ```
+     > **Note:** The `dockerImage` parameter must be set to your Docker image reference (e.g., `phronesis-backend:latest`, or your ACR/Docker Hub image). This is required for GitHub Actions or container-based deployment.
+
    - SQL Database:
      ```sh
      az deployment group create \
