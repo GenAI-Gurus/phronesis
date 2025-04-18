@@ -100,8 +100,12 @@
 ---
 
 ### Discovered During Work
+- Fixed frontend test runner config: Use `npx vitest run` for non-interactive tests; updated tests to use robust async queries for Material UI dialogs.
+- Fixed backend test teardown to avoid SQLite readonly errors by checking if test.db exists before removal.
+
 - Disabled the `required` attribute on Material UI TextFields in test mode (via `required={import.meta.env.MODE !== 'test'}`) to ensure custom validation logic is exercised and testable in React Testing Library.
-- TODO: Implement Reflection Prompt Generator Endpoint
+- [x] Implement Reflection Prompt Generator Endpoint  
+    *Endpoint and Pytest unit tests complete. Ready for OpenAI integration and frontend UI.*
 - TODO: Integrate OpenAI API for Prompts
 - TODO: Develop UI for Reflection Prompts
 - TODO: Implement Auto Tagging and Categorization
@@ -111,8 +115,11 @@
 [x] 21. Create Decision Journal Data Model
 [x] 22. Implement Decision Journal API endpoints (session/message CRUD, status update)
 [x] 23. Implement Decision Journal Entry creation endpoint
-- TODO: Implement Decision Journal Entry listing and update endpoints
-[ ] 24. Build Decision Journal Form UI
+- [x] Implement Decision Journal Entry listing and update endpoints  
+    *Backend endpoints for listing and updating Decision Journal Entries implemented and fully tested (Pytest).*
+[x] 24. Build Decision Journal Form UI  
+    *Modern React UI at /journal for listing, creating, and editing entries. Modular components, robust error handling, and full unit test coverage (Vitest/RTL).*
+
 [ ] 25. Integrate Speech-to-Text (Optional)
 [ ] 26. Implement Reflection Prompt Generator Endpoint
 [ ] 27. Integrate OpenAI API for Prompts
