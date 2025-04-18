@@ -13,6 +13,9 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 allowed_origins = os.getenv("CORS_ALLOW_ORIGINS", "http://localhost:5173").split(",")
+print(
+    "CORS allowed origins:", allowed_origins
+)  # Debug: confirm CORS origins at runtime
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,  # Set via CORS_ALLOW_ORIGINS env var (comma-separated)
