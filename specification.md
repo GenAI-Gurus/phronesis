@@ -1,5 +1,12 @@
 # Phronesis Product Specification (MVP)
 
+## Project Metadata
+- GitHub Organization: genai-gurus
+- Main Repo: https://github.com/genai-gurus/phronesis
+- Azure Resource Prefix: phronesis
+- Default Branch: main
+
+
 ## Overview & Vision
 Phronesis is a B2C platform for mindful decision-making. It helps users reflect on past decisions, capture insights, and receive tailored decision support based on their values, personality, and circumstances. The platform aims to foster a habit of mindful decision-making, leveraging user-generated data for a feedback flywheel that enables deep personalization and continuous improvement.
 
