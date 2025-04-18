@@ -77,6 +77,22 @@ This section describes how to deploy the Phronesis frontend as an Azure Static W
    - Add your custom domain in the Azure Portal.
    - Azure manages SSL certificates automatically.
 
+### GitHub Actions Workflow (Required)
+
+To enable automatic deployment of the frontend to Azure Static Web Apps, you must add a GitHub Actions workflow:
+
+1. **Workflow File:** `.github/workflows/azure-static-web-apps.yml`
+2. **Secret:** Add your Azure Static Web Apps deployment token as a repository secret named `AZURE_STATIC_WEB_APPS_API_TOKEN`.
+   - Get the token from the Azure Portal → Your Static Web App → Deployment Token.
+   - In GitHub: Settings → Secrets and variables → Actions → New repository secret.
+3. **How it works:**
+   - On every push or PR to `main`, the workflow will build the frontend (`frontend/`), output to `dist/`, and deploy to Azure Static Web Apps.
+   - You can customize the workflow as needed for additional build/test steps.
+
+**Workflow reference:**
+
+See the maintained workflow at [`.github/workflows/azure-static-web-apps.yml`](../../.github/workflows/azure-static-web-apps.yml) for build and deployment details.
+
 ### References
 - [Azure Static Web Apps Docs](https://learn.microsoft.com/en-us/azure/static-web-apps/overview)
 - [Bicep Static Web App Reference](https://learn.microsoft.com/en-us/azure/templates/microsoft.web/staticsites)
