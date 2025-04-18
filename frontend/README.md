@@ -16,6 +16,18 @@ npm run dev
 
 The app will be available at [http://localhost:5173](http://localhost:5173) by default.
 
+## Setup & Development
+
+### ⚠️ Environment Variables for Production (Vite)
+- When deploying with Azure Static Web Apps **via GitHub Actions**, all Vite environment variables (e.g., `VITE_API_URL`) must be set as **GitHub secrets** and passed via the `env:` block in the workflow.
+- **Do not rely on Azure portal environment variables**—they are not available during GitHub Actions builds.
+- Example:
+  ```yaml
+  env:
+    VITE_API_URL: ${{ secrets.VITE_API_URL }}
+  ```
+- For local development, you can still use a `.env` file.
+
 ## Project Structure
 
 - `src/components/` – Reusable UI components

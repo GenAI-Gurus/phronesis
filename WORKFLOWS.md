@@ -37,7 +37,7 @@ Workflows are defined in `.github/workflows/`. They automate CI, deployment, lin
   - Deploys to Azure Static Web Apps
 - **Trigger:** Push or PR to `main` branch
 - **Secrets:** Requires `AZURE_STATIC_WEB_APPS_API_TOKEN` in repo secrets
-
+- **Important:** For Vite/React builds in GitHub Actions, all environment variables (e.g., `VITE_API_URL`) **must be set as GitHub secrets** and passed via the `env:` block in the workflow. Azure portal environment variables will NOT be available during GitHub Actions builds.
 ### 3. `ci.yml`
 - **Purpose:**
   - Runs general CI tasks (tests, lint, etc.)

@@ -1,4 +1,4 @@
-name: Azure Static Web Apps CI/CD
+name: Azure Static Web Apps deployment
 
 on:
   push:
@@ -39,3 +39,6 @@ jobs:
           action: "upload"
           app_location: "frontend"
           output_location: "dist"
+        env:
+          # Vite environment variables must be set as GitHub secrets for builds in Actions
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
