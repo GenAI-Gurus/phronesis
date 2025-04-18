@@ -9,13 +9,18 @@ app = FastAPI(title="Phronesis API", version="0.1.0")
 # --- CORS Middleware for frontend-backend communication (dev only) ---
 from fastapi.middleware.cors import CORSMiddleware
 
+# --- CORS Middleware for frontend-backend communication (prod/dev) ---
+import os
+
+allowed_origins = os.getenv("CORS_ALLOW_ORIGINS", "http://localhost:5173").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For dev; restrict to ["http://localhost:5173"] in prod
+    allow_origins=allowed_origins,  # Set via CORS_ALLOW_ORIGINS env var (comma-separated)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 from app.api.v1.endpoints import users, auth
 

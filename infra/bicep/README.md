@@ -23,6 +23,10 @@ This directory contains Infrastructure-as-Code (IaC) templates for deploying the
    ```
 
 ## Resources
+- **Virtual Network (VNet):** Provides private networking for backend and database resources
+- **App Service VNet Integration:** Secures backend traffic within the VNet
+- **SQL Database Private Endpoint:** Allows private, secure access to SQL from the backend
+
 - **App Service:** Linux, Docker Container (Web App for Containers), minimal instance size, autoscale
 - **SQL Database:** Basic/serverless tier
 - **Blob Storage:** Pay-as-you-go
@@ -96,6 +100,32 @@ See the maintained workflow at [`.github/workflows/azure-static-web-apps.yml`](.
 ### References
 - [Azure Static Web Apps Docs](https://learn.microsoft.com/en-us/azure/static-web-apps/overview)
 - [Bicep Static Web App Reference](https://learn.microsoft.com/en-us/azure/templates/microsoft.web/staticsites)
+
+---
+
+## VNet & Private Endpoint Deployment
+
+### 1. Deploy the Virtual Network (VNet)
+```sh
+az deployment group create \
+  --resource-group phronesis-rg \
+  --template-file vnet.bicep
+```
+
+### 2. Integrate App Service with VNet (Manual Step)
+- In Azure Portal, go to your App Service → Networking → VNet Integration.
+- Select the `appservice-subnet` from your new VNet.
+
+### 3. Deploy SQL Private Endpoint
+```sh
+az deployment group create \
+  --resource-group phronesis-rg \
+  --template-file sql_private_endpoint.bicep \
+  --parameters sqlServerName=phronesis-sqlserver sqlDbName=phronesisdb
+```
+
+### 4. Update SQL Server Firewall
+- Restrict public access and allow only connections via Private Endpoint.
 
 ---
 
