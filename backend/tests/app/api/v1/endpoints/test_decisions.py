@@ -36,12 +36,21 @@ def setup_test_db():
     ValueCalibrationBase.metadata.create_all(bind=engine)
     GamificationBase.metadata.create_all(bind=engine)
     yield
-    # Drop all tables after tests (optional, for clean state)
-    GamificationBase.metadata.drop_all(bind=engine)
-    ValueCalibrationBase.metadata.drop_all(bind=engine)
-    ReflectionBase.metadata.drop_all(bind=engine)
-    DecisionBase.metadata.drop_all(bind=engine)
-    UserBase.metadata.drop_all(bind=engine)
+    # Only drop tables and remove test.db if the file exists (prevents readonly error)
+    db_path = os.path.join(
+        os.path.dirname(__file__), "../../../../../../backend/test.db"
+    )
+    if os.path.exists(db_path):
+        GamificationBase.metadata.drop_all(bind=engine)
+        ValueCalibrationBase.metadata.drop_all(bind=engine)
+        ReflectionBase.metadata.drop_all(bind=engine)
+        DecisionBase.metadata.drop_all(bind=engine)
+        UserBase.metadata.drop_all(bind=engine)
+        try:
+            os.chmod(db_path, 0o666)
+            os.remove(db_path)
+        except Exception as e:
+            print(f"[teardown] Could not remove test.db: {e}")
 
 
 import uuid
@@ -100,6 +109,116 @@ def test_create_journal_entry_expected(user_and_auth_header, client):
     assert isinstance(data["values"], list)
 
 
+def test_list_journal_entries_expected(user_and_auth_header, client):
+    """Expected: List all journal entries for the authenticated user."""
+    _, auth_header = user_and_auth_header
+    # Create two entries
+    payload1 = {"title": "Entry 1"}
+    payload2 = {"title": "Entry 2", "domain": "health"}
+    client.post("/api/v1/decisions/journal", json=payload1, headers=auth_header)
+    client.post("/api/v1/decisions/journal", json=payload2, headers=auth_header)
+    response = client.get("/api/v1/decisions/journal", headers=auth_header)
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) >= 2
+    titles = [entry["title"] for entry in data]
+    assert "Entry 1" in titles and "Entry 2" in titles
+
+
+def test_list_journal_entries_failure_unauthenticated(client):
+    """Failure: List journal entries without authentication."""
+    response = client.get("/api/v1/decisions/journal")
+    assert response.status_code == 401
+
+
+def test_update_journal_entry_expected(user_and_auth_header, client):
+    """Expected: Update title and values of a journal entry."""
+    _, auth_header = user_and_auth_header
+    payload = {"title": "Original Title", "values": ["courage"]}
+    resp = client.post("/api/v1/decisions/journal", json=payload, headers=auth_header)
+    assert resp.status_code == 201
+    entry = resp.json()
+    entry_id = entry["id"]
+    patch_payload = {"title": "Updated Title", "values": ["honesty", "growth"]}
+    patch_resp = client.patch(
+        f"/api/v1/decisions/journal/{entry_id}", json=patch_payload, headers=auth_header
+    )
+    assert patch_resp.status_code == 200
+    updated = patch_resp.json()
+    assert updated["title"] == "Updated Title"
+    assert updated["values"] == ["honesty", "growth"]
+    assert updated["id"] == entry_id
+
+
+def test_update_journal_entry_edge_no_fields(user_and_auth_header, client):
+    """Edge: Update journal entry with no fields (should not change anything, but succeed)."""
+    _, auth_header = user_and_auth_header
+    payload = {"title": "Edge Case Title"}
+    resp = client.post("/api/v1/decisions/journal", json=payload, headers=auth_header)
+    entry_id = resp.json()["id"]
+    patch_resp = client.patch(
+        f"/api/v1/decisions/journal/{entry_id}", json={}, headers=auth_header
+    )
+    assert patch_resp.status_code == 200
+    unchanged = patch_resp.json()
+    assert unchanged["title"] == "Edge Case Title"
+
+
+def test_update_journal_entry_failure_unauthenticated(user_and_auth_header, client):
+    """Failure: Update journal entry without authentication."""
+    _, auth_header = user_and_auth_header
+    payload = {"title": "Fail Unauth"}
+    resp = client.post("/api/v1/decisions/journal", json=payload, headers=auth_header)
+    entry_id = resp.json()["id"]
+    patch_payload = {"title": "Should Not Update"}
+    patch_resp = client.patch(
+        f"/api/v1/decisions/journal/{entry_id}", json=patch_payload
+    )
+    assert patch_resp.status_code == 401
+
+
+def test_update_journal_entry_failure_not_found(user_and_auth_header, client):
+    """Failure: Update nonexistent journal entry."""
+    _, auth_header = user_and_auth_header
+    patch_payload = {"title": "Does Not Exist"}
+    patch_resp = client.patch(
+        f"/api/v1/decisions/journal/00000000-0000-0000-0000-000000000000",
+        json=patch_payload,
+        headers=auth_header,
+    )
+    assert patch_resp.status_code == 404
+
+
+def test_update_journal_entry_failure_invalid_id(user_and_auth_header, client):
+    """Failure: Update with invalid UUID format."""
+    _, auth_header = user_and_auth_header
+    patch_payload = {"title": "Bad ID"}
+    patch_resp = client.patch(
+        f"/api/v1/decisions/journal/not-a-uuid",
+        json=patch_payload,
+        headers=auth_header,
+    )
+    assert patch_resp.status_code == 422
+
+    _, auth_header = user_and_auth_header
+    payload = {
+        "title": "My Decision",
+        "context": "Context info",
+        "anticipated_outcomes": "Outcome",
+        "values": ["integrity", "growth"],
+        "domain": "career",
+    }
+    response = client.post(
+        "/api/v1/decisions/journal", json=payload, headers=auth_header
+    )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["title"] == "My Decision"
+    assert data["user_id"]
+    assert isinstance(data["values"], list)
+
+
 def test_create_journal_entry_edge_empty_title(user_and_auth_header, client):
     _, auth_header = user_and_auth_header
     payload = {"title": ""}
@@ -126,6 +245,8 @@ def test_create_journal_entry_failure_unauthenticated(client):
 
 
 # --- DecisionChatSession tests ---
+
+
 def test_create_decision_session_expected(user_and_auth_header, client):
     _, auth_header = user_and_auth_header
     response = client.post(

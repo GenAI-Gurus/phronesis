@@ -314,4 +314,86 @@ def update_decision_session(
     return session
 
 
-# Endpoints for deleting sessions/messages can be added as needed.
+# --- DecisionJournalEntry: List & Update Endpoints ---
+
+
+class DecisionJournalEntryUpdate(BaseModel):
+    title: Optional[str] = None
+    context: Optional[str] = None
+    anticipated_outcomes: Optional[str] = None
+    values: Optional[List[str]] = None
+    domain: Optional[str] = None
+
+
+@router.get("/journal", response_model=List[DecisionJournalEntryOut])
+def list_decision_journal_entries(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    List all decision journal entries for the authenticated user.
+
+    Args:
+        db (Session): SQLAlchemy session dependency.
+        current_user (User): The authenticated user.
+
+    Returns:
+        List[DecisionJournalEntry]: All entries for user.
+    """
+    from app.models.decision import DecisionJournalEntry
+
+    return (
+        db.query(DecisionJournalEntry)
+        .filter(DecisionJournalEntry.user_id == str(current_user.id))
+        .order_by(DecisionJournalEntry.created_at.desc())
+        .all()
+    )
+
+
+@router.patch("/journal/{entry_id}", response_model=DecisionJournalEntryOut)
+def update_decision_journal_entry(
+    entry_id: str,
+    entry_update: DecisionJournalEntryUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Update a decision journal entry (partial update).
+
+    Args:
+        entry_id (str): The entry UUID (as string).
+        entry_update (DecisionJournalEntryUpdate): The update payload.
+        db (Session): SQLAlchemy session dependency.
+        current_user (User): The authenticated user.
+
+    Returns:
+        DecisionJournalEntry: The updated entry.
+
+    Raises:
+        HTTPException: If entry_id is invalid or entry not found.
+    """
+    import uuid
+    from app.models.decision import DecisionJournalEntry
+
+    try:
+        entry_uuid = uuid.UUID(entry_id)
+    except (ValueError, AttributeError):
+        raise HTTPException(status_code=422, detail="Invalid entry_id format")
+    entry = (
+        db.query(DecisionJournalEntry)
+        .filter_by(id=str(entry_uuid), user_id=str(current_user.id))
+        .first()
+    )
+    if not entry:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    # Update only provided fields
+    data = entry_update.dict(exclude_unset=True)
+    for field, value in data.items():
+        setattr(entry, field, value)
+    entry.updated_at = datetime.datetime.utcnow()  # Reason: always update timestamp
+    db.commit()
+    db.refresh(entry)
+    return entry
+
+
+# Endpoints for deleting sessions/messages/entries can be added as needed.
