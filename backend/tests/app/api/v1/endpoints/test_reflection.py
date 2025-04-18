@@ -87,4 +87,57 @@ def test_generate_prompts_failure_unauthenticated():
     assert response.status_code == 401
 
 
+def test_generate_prompts_openai_success(
+    monkeypatch, auth_header, create_journal_entry
+):
+    """Expected: OpenAI API returns three prompts (mocked)."""
+
+    def mock_chat_completion_create(*args, **kwargs):
+        class MockChoice:
+            message = type(
+                "msg",
+                (),
+                {
+                    "content": "1. Why did you make this decision?\n2. What values did it touch?\n3. How do you feel now?"
+                },
+            )()
+
+        return type("resp", (), {"choices": [MockChoice()]})()
+
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-key")
+    monkeypatch.setattr("openai.ChatCompletion.create", mock_chat_completion_create)
+    payload = {"entry_id": create_journal_entry}
+    response = client.post(
+        "/api/v1/reflection/prompts/generate", json=payload, headers=auth_header
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["prompts"] == [
+        "Why did you make this decision?",
+        "What values did it touch?",
+        "How do you feel now?",
+    ]
+    assert data["ai_generated"] is True
+
+
+def test_generate_prompts_openai_error_fallback(
+    monkeypatch, auth_header, create_journal_entry
+):
+    """Failure: OpenAI API raises error, fallback to static prompts."""
+
+    def mock_chat_completion_create(*args, **kwargs):
+        raise RuntimeError("OpenAI API failure")
+
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-key")
+    monkeypatch.setattr("openai.ChatCompletion.create", mock_chat_completion_create)
+    payload = {"entry_id": create_journal_entry}
+    response = client.post(
+        "/api/v1/reflection/prompts/generate", json=payload, headers=auth_header
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert any("Reflect on your decision" in p for p in data["prompts"])
+    assert data["ai_generated"] is True
+
+
 # TODO: Add more edge/failure tests as Reflection Prompt API evolves

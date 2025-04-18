@@ -12,6 +12,7 @@ from app.db.session import get_db
 from app.core.security import get_current_user
 from app.models.user import User
 import os
+import openai
 
 router = APIRouter()
 
@@ -76,12 +77,54 @@ def generate_reflection_prompts(
     # Reason: Integrate with OpenAI API if configured, otherwise mock
     openai_api_key = os.getenv("OPENAI_API_KEY")
     if openai_api_key:
-        # TODO: Integrate with OpenAI API (actual call)
-        prompts = [
-            f"Reflect on why you made the decision: '{entry.title}'.",
-            "What values did this decision touch upon?",
-            "How do you feel about the outcome so far?",
-        ]
+        try:
+            openai.api_key = openai_api_key
+            # Reason: Use ChatCompletion for robust prompt generation
+            system_prompt = "You are a decision coach. Generate 3 concise, thoughtful reflection questions for the user, based on the following decision journal entry."
+            user_content = f"Title: {entry.title}\n"
+            if entry.context:
+                user_content += f"Context: {entry.context}\n"
+            if entry.anticipated_outcomes:
+                user_content += f"Anticipated Outcomes: {entry.anticipated_outcomes}\n"
+            if entry.values:
+                user_content += f"Values: {', '.join(entry.values)}\n"
+            if entry.domain:
+                user_content += f"Domain: {entry.domain}\n"
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_content},
+                ],
+                max_tokens=256,
+                n=1,
+                temperature=0.7,
+            )
+            # Reason: Expect model to return numbered or bulleted questions
+            import re
+
+            ai_output = response.choices[0].message.content.strip()
+
+            def clean_prompt(line: str) -> str:
+                # Remove leading numbers, dashes, bullets, whitespace
+                return re.sub(r"^(\s*[-•\d]+[\.)]?\s*)", "", line).strip()
+
+            prompts = [
+                clean_prompt(q) for q in ai_output.split("\n") if clean_prompt(q)
+            ]
+            # Filter to 3 questions max
+            prompts = prompts[:3]
+            if not prompts or len(prompts) < 2:
+                # Fallback if model output is not as expected
+                raise ValueError("OpenAI did not return enough prompts")
+        except Exception as e:
+            print(f"[ERROR] OpenAI API failed: {e}")
+            # Fallback to static prompts
+            prompts = [
+                f"Reflect on your decision: '{entry.title}'.",
+                "What was your main motivation?",
+                "What would you do differently next time?",
+            ]
     else:
         # Mock prompts for local/dev/testing
         prompts = [

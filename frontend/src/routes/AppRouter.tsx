@@ -8,6 +8,7 @@ import NewDecisionPage from '../pages/NewDecisionPage';
 import DecisionJournalPage from '../pages/DecisionJournalPage';
 import ValueCalibrationPage from '../pages/ValueCalibrationPage';
 import ReflectionPage from '../pages/ReflectionPage';
+import ReflectionPromptPage from '../pages/ReflectionPromptPage';
 import ChallengesPage from '../pages/ChallengesPage';
 
 const AppRouter: React.FC = () => (
@@ -20,6 +21,7 @@ const AppRouter: React.FC = () => (
       <Route path="/journal/new" element={<NewDecisionPage />} />
       <Route path="/value-calibration" element={<ValueCalibrationPage />} />
       <Route path="/reflection" element={<ReflectionPage />} />
+      <Route path="/reflection-prompts" element={<ReflectionPromptPage />} />
       <Route path="/challenges" element={<ChallengesPage />} />
       <Route path="*" element={<LoginPage />} />
     </Routes>

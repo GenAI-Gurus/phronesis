@@ -106,8 +106,10 @@
 - Disabled the `required` attribute on Material UI TextFields in test mode (via `required={import.meta.env.MODE !== 'test'}`) to ensure custom validation logic is exercised and testable in React Testing Library.
 - [x] Implement Reflection Prompt Generator Endpoint  
     *Endpoint and Pytest unit tests complete. Ready for OpenAI integration and frontend UI.*
-- TODO: Integrate OpenAI API for Prompts
-- TODO: Develop UI for Reflection Prompts
+- [x] Integrate OpenAI API for Prompts  
+    *Backend Reflection Prompt Generator endpoint now uses OpenAI securely and robustly, with full tests and fallback logic.*
+- [x] Develop UI for Reflection Prompts  
+    *React UI at /reflection-prompts lets user select a journal entry and generate AI-powered prompts. Robust error/loading/empty handling. Full unit test coverage (Vitest/RTL).*
 - TODO: Implement Auto Tagging and Categorization
 [x] 20. Develop User Dashboard UI
 

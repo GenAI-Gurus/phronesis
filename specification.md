@@ -20,6 +20,34 @@ The platform should feel warm and supportive, offering encouragement and empathy
 - Focus on a functional MVP that implements the tasks listed in progress.md.
 - Prioritize features that support reflection, journaling, and basic value assessment.
 
+---
+
+## AI-Powered Reflection Prompts
+
+- **Endpoint:** `POST /api/v1/reflection/prompts/generate`
+- **Purpose:** Generate personalized reflection prompts for a decision journal entry using OpenAI GPT-3.5-turbo (if `OPENAI_API_KEY` is set).
+- **Request:**
+  ```json
+  {
+    "entry_id": "<journal_entry_uuid>"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "prompts": [
+      "Why did you make this decision?",
+      "What values did it touch?",
+      "How do you feel now?"
+    ],
+    "ai_generated": true
+  }
+  ```
+- **Fallback:** If `OPENAI_API_KEY` is not set or API call fails, static prompts are returned.
+- **Security:** Requires authentication (JWT Bearer token).
+- **Environment Variable:**
+  - `OPENAI_API_KEY` (required for AI prompts)
+
 ## CI/CD Status & Contributor Guidance (as of 2025-04-16)
 - LLM-as-judge integration test runs in CI for Decision Support Chat API (uses OpenAI GPT-4.1-nano as a judge).
 - Test output (including OpenAI prompts, answers, and verdicts) is printed in CI logs for transparency.
