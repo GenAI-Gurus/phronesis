@@ -39,8 +39,11 @@ class DecisionJournalEntry(Base):
         context (str): Context or background for the decision.
         anticipated_outcomes (str): Anticipated outcomes.
         values (list): List of values touched by the decision.
-        domain (str): Auto-tagged domain (e.g., career, health).
-        sentiment (str): Auto-analyzed sentiment.
+        domain (str): (Deprecated) Single auto-tagged domain (e.g., career, health).
+        sentiment (str): (Deprecated) Single auto-analyzed sentiment.
+        domain_tags (list): List of detected domains.
+        sentiment_tag (str): Detected sentiment.
+        keywords (list): Extracted keywords/topics.
         created_at (datetime): Creation timestamp.
         updated_at (datetime): Last update timestamp.
     """
@@ -52,8 +55,11 @@ class DecisionJournalEntry(Base):
     context = Column(String, nullable=True)
     anticipated_outcomes = Column(String, nullable=True)
     values = Column(JSON, nullable=True)  # Store as JSON array
-    domain = Column(String, nullable=True)
-    sentiment = Column(String, nullable=True)
+    domain = Column(String, nullable=True)  # Deprecated
+    sentiment = Column(String, nullable=True)  # Deprecated
+    domain_tags = Column(JSON, nullable=True)  # List of strings
+    sentiment_tag = Column(String, nullable=True)
+    keywords = Column(JSON, nullable=True)  # List of strings
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow

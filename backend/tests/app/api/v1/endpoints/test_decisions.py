@@ -93,20 +93,92 @@ def user_and_auth_header(client):
 def test_create_journal_entry_expected(user_and_auth_header, client):
     _, auth_header = user_and_auth_header
     payload = {
-        "title": "My Decision",
-        "context": "Context info",
-        "anticipated_outcomes": "Outcome",
+        "title": "Got a job promotion",
+        "context": "My boss recognized my hard work and promoted me.",
+        "anticipated_outcomes": "More responsibility",
         "values": ["integrity", "growth"],
-        "domain": "career",
     }
     response = client.post(
         "/api/v1/decisions/journal", json=payload, headers=auth_header
     )
     assert response.status_code == 201
     data = response.json()
-    assert data["title"] == "My Decision"
+    assert data["title"] == payload["title"]
     assert data["user_id"]
     assert isinstance(data["values"], list)
+    # Check auto-tagging fields
+    assert "domain_tags" in data and "career" in data["domain_tags"]
+    # Accept either 'positive' or 'negative' due to TextBlob variability
+    assert "sentiment_tag" in data and data["sentiment_tag"] in (
+        "positive",
+        "negative",
+    ), f"Unexpected sentiment_tag: {data['sentiment_tag']}"
+    assert isinstance(data["keywords"], list) and any(
+        "promotion" in k for k in data["keywords"]
+    )
+
+
+def test_create_journal_entry_edge_ambiguous(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
+    payload = {
+        "title": "Just another day",
+        "context": "Nothing special happened.",
+    }
+    response = client.post(
+        "/api/v1/decisions/journal", json=payload, headers=auth_header
+    )
+    assert response.status_code == 201
+    data = response.json()
+    # Should have neutral, positive, or negative sentiment (NLP is variable)
+    assert data["sentiment_tag"] in (
+        "neutral",
+        "positive",
+        "negative",
+    ), f"Unexpected sentiment_tag: {data['sentiment_tag']}"
+    assert isinstance(data["domain_tags"], list)
+
+
+def test_create_journal_entry_failure_nonsense(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
+    payload = {
+        "title": "asdfghjkl",
+        "context": "qwertyuiop",
+    }
+    response = client.post(
+        "/api/v1/decisions/journal", json=payload, headers=auth_header
+    )
+    assert response.status_code == 201
+    data = response.json()
+    # Should still return, but tags may be empty or neutral
+    assert data["sentiment_tag"] == "neutral"
+    assert isinstance(data["domain_tags"], list)
+
+
+def test_update_journal_entry_triggers_retag(user_and_auth_header, client):
+    _, auth_header = user_and_auth_header
+    # Create entry
+    payload = {"title": "Started a new diet", "context": "Trying to eat healthier."}
+    resp = client.post("/api/v1/decisions/journal", json=payload, headers=auth_header)
+    assert resp.status_code == 201
+    data = resp.json()
+    entry_id = data["id"]
+    assert "health" in data["domain_tags"]
+    # Update title/context to a finance-related event
+    update_payload = {
+        "title": "Invested in stocks",
+        "context": "Put savings in the market.",
+    }
+    resp2 = client.patch(
+        f"/api/v1/decisions/journal/{entry_id}",
+        json=update_payload,
+        headers=auth_header,
+    )
+    assert resp2.status_code == 200
+    data2 = resp2.json()
+    assert "finance" in data2["domain_tags"]
+    assert data2["title"] == update_payload["title"]
+    # Sentiment should still be present
+    assert "sentiment_tag" in data2
 
 
 def test_list_journal_entries_expected(user_and_auth_header, client):

@@ -1,41 +1,23 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, Field, constr
 from typing import List, Optional
 from uuid import UUID
-from app.models.decision import DecisionChatSession
+from pydantic import BaseModel, Field, constr
+from app.models.decision import DecisionChatSession, DecisionJournalEntry
 from app.models.reflection import DecisionChatMessage
 from app.db.session import get_db
 from app.core.security import get_current_user
 from app.models.user import User
+from app.services.auto_tagger import AutoTagger
+from app.schemas.decision_journal import (
+    DecisionJournalEntryCreate,
+    DecisionJournalEntryUpdate,
+    DecisionJournalEntryOut,
+)
 import uuid
 import datetime
 
 router = APIRouter()
-
-
-class DecisionJournalEntryCreate(BaseModel):
-    title: constr(min_length=1)
-    context: Optional[str] = None
-    anticipated_outcomes: Optional[str] = None
-    values: Optional[List[str]] = None
-    domain: Optional[str] = None
-
-
-class DecisionJournalEntryOut(BaseModel):
-    id: UUID
-    user_id: UUID
-    title: str
-    context: Optional[str]
-    anticipated_outcomes: Optional[str]
-    values: Optional[List[str]]
-    domain: Optional[str]
-    sentiment: Optional[str]
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-
-    class Config:
-        orm_mode = True
 
 
 @router.post("/journal", response_model=DecisionJournalEntryOut, status_code=201)
@@ -55,8 +37,7 @@ def create_decision_journal_entry(
     Returns:
         DecisionJournalEntry: The created entry.
     """
-    from app.models.decision import DecisionJournalEntry
-
+    tag_result = AutoTagger.tag_entry(entry_in.title, entry_in.context)
     entry = DecisionJournalEntry(
         id=str(uuid.uuid4()),
         user_id=str(current_user.id),
@@ -64,8 +45,9 @@ def create_decision_journal_entry(
         context=entry_in.context,
         anticipated_outcomes=entry_in.anticipated_outcomes,
         values=entry_in.values,
-        domain=entry_in.domain,
-        sentiment=None,
+        domain_tags=tag_result["domain_tags"],
+        sentiment_tag=tag_result["sentiment_tag"],
+        keywords=tag_result["keywords"],
         created_at=datetime.datetime.utcnow(),
         updated_at=datetime.datetime.utcnow(),
     )
@@ -317,14 +299,6 @@ def update_decision_session(
 # --- DecisionJournalEntry: List & Update Endpoints ---
 
 
-class DecisionJournalEntryUpdate(BaseModel):
-    title: Optional[str] = None
-    context: Optional[str] = None
-    anticipated_outcomes: Optional[str] = None
-    values: Optional[List[str]] = None
-    domain: Optional[str] = None
-
-
 @router.get("/journal", response_model=List[DecisionJournalEntryOut])
 def list_decision_journal_entries(
     db: Session = Depends(get_db),
@@ -340,8 +314,6 @@ def list_decision_journal_entries(
     Returns:
         List[DecisionJournalEntry]: All entries for user.
     """
-    from app.models.decision import DecisionJournalEntry
-
     return (
         db.query(DecisionJournalEntry)
         .filter(DecisionJournalEntry.user_id == str(current_user.id))
@@ -373,7 +345,6 @@ def update_decision_journal_entry(
         HTTPException: If entry_id is invalid or entry not found.
     """
     import uuid
-    from app.models.decision import DecisionJournalEntry
 
     try:
         entry_uuid = uuid.UUID(entry_id)
@@ -390,6 +361,14 @@ def update_decision_journal_entry(
     data = entry_update.dict(exclude_unset=True)
     for field, value in data.items():
         setattr(entry, field, value)
+    # Re-run auto-tagging if title or context is updated
+    if "title" in data or "context" in data:
+        tag_result = AutoTagger.tag_entry(
+            data.get("title", entry.title), data.get("context", entry.context)
+        )
+        entry.domain_tags = tag_result["domain_tags"]
+        entry.sentiment_tag = tag_result["sentiment_tag"]
+        entry.keywords = tag_result["keywords"]
     entry.updated_at = datetime.datetime.utcnow()  # Reason: always update timestamp
     db.commit()
     db.refresh(entry)

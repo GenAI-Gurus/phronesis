@@ -190,6 +190,50 @@ The backend is deployed to Azure App Service using a custom Docker image, which 
 ## Personalization
 - Start with a basic value assessment for each user during onboarding.
 
+---
+
+## Auto Tagging and Categorization for Journal Entries
+
+### Purpose
+Automatically assign relevant tags and categories to each decision journal entry, improving search, analytics, and personalized insights for users.
+
+### Scope
+
+**Tag Types:**
+- **Domain Tags:** (e.g., Career, Health, Relationships, Finance, Personal Growth)
+- **Sentiment Tags:** (e.g., Positive, Negative, Neutral)
+- **Custom/AI Tags:** Extracted keywords or topics (e.g., “promotion”, “family”, “risk”)
+
+**Trigger:**
+- Auto-tagging occurs on journal entry creation and update.
+
+**Implementation Approach:**
+- **Domain Tagging:** Use simple rules (keyword matching in title/context) and/or a lightweight NLP model to assign one or more domains.
+- **Sentiment Analysis:** Use a Python NLP library (e.g., TextBlob, Vader) for sentiment scoring.
+- **Keyword Extraction:** Use RAKE, spaCy, or similar to extract salient keywords as additional tags.
+
+**Data Model Changes:**
+- Extend the DecisionJournalEntry model to include:
+  - `domain_tags: List[str]`
+  - `sentiment_tag: str`
+  - `keywords: List[str]`
+
+**API Changes:**
+- On POST/PUT to the journal entry endpoint, auto-tagging logic will run and update the entry with tags.
+- Tags are returned in the API response and stored in the database.
+
+**Testing:**
+- Pytest unit tests for:
+  - Correct tagging for expected cases (clear domains, strong sentiment)
+  - Edge cases (ambiguous or mixed-content entries)
+  - Failure cases (empty or nonsense input)
+
+**Extensibility:**
+- Design tagging logic as a service/module for easy future replacement with more advanced AI/LLM-based tagging.
+
+---
+
+
 ## Competitive Edge
 - No specific competitors or benchmarks targeted at this stage; focus on unique positioning through user-centric design and empathetic support.
 

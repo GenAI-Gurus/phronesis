@@ -110,7 +110,8 @@
     *Backend Reflection Prompt Generator endpoint now uses OpenAI securely and robustly, with full tests and fallback logic.*
 - [x] Develop UI for Reflection Prompts  
     *React UI at /reflection-prompts lets user select a journal entry and generate AI-powered prompts. Robust error/loading/empty handling. Full unit test coverage (Vitest/RTL).*
-- TODO: Implement Auto Tagging and Categorization
+- [x] Implement Auto Tagging and Categorization  
+    *Backend, migration, and Pytest tests complete. API now returns domain_tags, sentiment_tag, and keywords. Frontend integration is next.*
 [x] 20. Develop User Dashboard UI
 
 *Modular dashboard UI implemented in React with Material UI. Includes user summary, recent journals, quick actions, and progress badges. Unit tests cover expected, edge, and failure cases. Ready for backend integration and further enhancements.*
