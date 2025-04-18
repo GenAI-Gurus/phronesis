@@ -1,15 +1,15 @@
 # Azure Bicep Deployment Instructions
 
+## Organization & Repo Info
+- GitHub Organization: genai-gurus
+- Main Repo: https://github.com/genai-gurus/phronesis
+- Azure Resource Prefix: phronesis
+- Default Branch: main
+
+
 This directory contains Infrastructure-as-Code (IaC) templates for deploying the Phronesis backend to Azure. All resources are designed for minimal fixed cost and easy scaling.
 
-## Resources
-- **App Service:** Linux, Docker Container (Web App for Containers), minimal instance size, autoscale
-- **SQL Database:** Basic/serverless tier
-- **Blob Storage:** Pay-as-you-go
-- **Key Vault:** For secrets
-- **Application Insights:** Free tier
-
-## Deployment Steps
+## General Setup
 
 1. **Login to Azure CLI**
    ```sh
@@ -22,7 +22,70 @@ This directory contains Infrastructure-as-Code (IaC) templates for deploying the
    az group create --name phronesis-rg --location westeurope
    ```
 
-3. **Deploy resources**
+## Resources
+- **App Service:** Linux, Docker Container (Web App for Containers), minimal instance size, autoscale
+- **SQL Database:** Basic/serverless tier
+- **Blob Storage:** Pay-as-you-go
+- **Key Vault:** For secrets
+- **Application Insights:** Free tier
+- **Static Web App (Frontend):** Azure Static Web App for React/Vite SPA (see below)
+
+---
+
+## Frontend Deployment: Azure Static Web App
+
+This section describes how to deploy the Phronesis frontend as an Azure Static Web App using Bicep.
+
+### Overview
+- Deploys a globally distributed, secure, and cost-effective static site for the React/Vite frontend.
+- Integrates with GitHub for CI/CD.
+- Managed SSL, custom domains, and environment variables supported.
+
+### Prerequisites
+- Azure CLI installed and logged in.
+- Resource group created (see above).
+- GitHub repository with the frontend code.
+
+### Deploy the Static Web App
+
+1. **Update parameters as needed:**
+   - `name`: Name for your Static Web App (must be globally unique)
+   - `repositoryUrl`: Your GitHub repo URL (e.g., `https://github.com/genai-gurus/phronesis`)
+   - `branch`: Branch to deploy from (default: `main`)
+   - `appLocation`: Path to frontend source in repo (default: `frontend`)
+   - `outputLocation`: Build output (default: `dist`)
+
+2. **Deploy with Azure CLI:**
+   ```sh
+   az deployment group create \
+     --resource-group phronesis-rg \
+     --template-file static_web_app.bicep \
+     --parameters \
+       name=phronesis-frontend-app \
+       repositoryUrl=https://github.com/genai-gurus/phronesis \
+       branch=main
+   ```
+
+3. **Configure Environment Variables (App Settings):**
+   - In the Azure Portal, go to your Static Web App resource → Configuration.
+   - Add `VITE_API_URL` with your backend’s Azure endpoint.
+
+4. **Push to GitHub:**
+   - Any push to the selected branch triggers CI/CD and deploys the latest frontend.
+
+5. **Custom Domain & HTTPS (Optional):**
+   - Add your custom domain in the Azure Portal.
+   - Azure manages SSL certificates automatically.
+
+### References
+- [Azure Static Web Apps Docs](https://learn.microsoft.com/en-us/azure/static-web-apps/overview)
+- [Bicep Static Web App Reference](https://learn.microsoft.com/en-us/azure/templates/microsoft.web/staticsites)
+
+---
+
+## Backend Deployment Steps
+
+1. **Deploy resources**
    - App Service (Docker):
      ```sh
      az deployment group create \
