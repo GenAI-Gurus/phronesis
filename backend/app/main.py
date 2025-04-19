@@ -69,6 +69,14 @@ app.include_router(
     tags=["future-self"],
 )
 
+from app.api.v1.endpoints import gamification
+
+app.include_router(
+    gamification.router,
+    prefix="/api/v1/gamification",
+    tags=["gamification"],
+)
+
 
 @app.get("/")
 def read_root():

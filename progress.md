@@ -148,8 +148,10 @@
 [ ] 39. Implement Life Theme & Progress Tracker
 [x] 40. Develop Progress Visualization UI
     - /progress page implemented with Material UI and Recharts. Visualizes value trends and decision activity using real backend data. Fully tested (expected, edge, failure cases) with ResizeObserver polyfill for chart compatibility in Vitest.
-[ ] 41. Create Gamification Module (Backend)
-[ ] 42. Develop Gamification UI Elements
+[x] 41. Create Gamification Module (Backend)
+    - Backend endpoints, models, and Pytest unit tests for streaks, badges, and challenges are implemented and documented. All tests pass.
+[x] 42. Develop Gamification UI Elements
+    - /gamification page implemented with Material UI. Renders badges, streaks, and challenges from backend. Fully tested (expected, edge, failure cases). MUI v5 Grid v2 migration warnings are non-blocking.
 
 ---
 

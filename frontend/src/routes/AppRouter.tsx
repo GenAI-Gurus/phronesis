@@ -14,6 +14,7 @@ import ReflectionPromptPage from '../pages/ReflectionPromptPage';
 import ChallengesPage from '../pages/ChallengesPage';
 import FutureSelfSimulatorPage from '../pages/FutureSelfSimulatorPage';
 import ProgressVisualizationPage from '../pages/ProgressVisualizationPage';
+import GamificationPage from '../pages/GamificationPage';
 
 const AppRouter: React.FC = () => (
   <Router>
