@@ -10,8 +10,30 @@ from app.models.decision import Base as DecisionBase
 from app.models.user import Base as UserBase
 from app.db.session import engine
 import uuid
+import json
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def mock_openai_chatcompletion(monkeypatch):
+    """
+    Patch openai.ChatCompletion.create to return deterministic tags for all journal entry creation in reflection tests.
+    """
+
+    def fake_create(*args, **kwargs):
+        function_args = json.dumps(
+            {
+                "domain_tags": ["career"],
+                "sentiment_tag": "positive",
+                "keywords": ["promotion", "boss", "work"],
+            }
+        )
+        return {
+            "choices": [{"message": {"function_call": {"arguments": function_args}}}]
+        }
+
+    monkeypatch.setattr("openai.ChatCompletion.create", fake_create)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -39,7 +61,7 @@ def auth_header():
     return {"Authorization": f"Bearer {token}"}
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def create_journal_entry(auth_header):
     # Create a decision journal entry for the user
     entry_data = {

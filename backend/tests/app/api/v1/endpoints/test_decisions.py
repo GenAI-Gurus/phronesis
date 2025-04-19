@@ -7,6 +7,8 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 from app.db.session import get_db
+from unittest.mock import patch
+import json
 
 
 import pytest
@@ -90,6 +92,28 @@ def user_and_auth_header(client):
 
 
 # --- DecisionJournalEntry tests ---
+@pytest.fixture(autouse=True)
+def mock_openai_chatcompletion(monkeypatch):
+    """
+    Patch openai.ChatCompletion.create to return deterministic tags for all journal entry tests.
+    """
+
+    def fake_create(*args, **kwargs):
+        # Simulate OpenAI function_call response
+        function_args = json.dumps(
+            {
+                "domain_tags": ["career"],
+                "sentiment_tag": "positive",
+                "keywords": ["promotion", "boss", "work"],
+            }
+        )
+        return {
+            "choices": [{"message": {"function_call": {"arguments": function_args}}}]
+        }
+
+    monkeypatch.setattr("openai.ChatCompletion.create", fake_create)
+
+
 def test_create_journal_entry_expected(user_and_auth_header, client):
     _, auth_header = user_and_auth_header
     payload = {
@@ -106,16 +130,10 @@ def test_create_journal_entry_expected(user_and_auth_header, client):
     assert data["title"] == payload["title"]
     assert data["user_id"]
     assert isinstance(data["values"], list)
-    # Check auto-tagging fields
-    assert "domain_tags" in data and "career" in data["domain_tags"]
-    # Accept either 'positive' or 'negative' due to TextBlob variability
-    assert "sentiment_tag" in data and data["sentiment_tag"] in (
-        "positive",
-        "negative",
-    ), f"Unexpected sentiment_tag: {data['sentiment_tag']}"
-    assert isinstance(data["keywords"], list) and any(
-        "promotion" in k for k in data["keywords"]
-    )
+    # Check auto-tagging fields (mocked)
+    assert data["domain_tags"] == ["career"]
+    assert data["sentiment_tag"] == "positive"
+    assert data["keywords"] == ["promotion", "boss", "work"]
 
 
 def test_create_journal_entry_edge_ambiguous(user_and_auth_header, client):
@@ -129,13 +147,10 @@ def test_create_journal_entry_edge_ambiguous(user_and_auth_header, client):
     )
     assert response.status_code == 201
     data = response.json()
-    # Should have neutral, positive, or negative sentiment (NLP is variable)
-    assert data["sentiment_tag"] in (
-        "neutral",
-        "positive",
-        "negative",
-    ), f"Unexpected sentiment_tag: {data['sentiment_tag']}"
-    assert isinstance(data["domain_tags"], list)
+    # Check that mocked OpenAI output is always returned
+    assert data["domain_tags"] == ["career"]
+    assert data["sentiment_tag"] == "positive"
+    assert data["keywords"] == ["promotion", "boss", "work"]
 
 
 def test_create_journal_entry_failure_nonsense(user_and_auth_header, client):
@@ -149,9 +164,10 @@ def test_create_journal_entry_failure_nonsense(user_and_auth_header, client):
     )
     assert response.status_code == 201
     data = response.json()
-    # Should still return, but tags may be empty or neutral
-    assert data["sentiment_tag"] == "neutral"
-    assert isinstance(data["domain_tags"], list)
+    # Check that mocked OpenAI output is always returned
+    assert data["domain_tags"] == ["career"]
+    assert data["sentiment_tag"] == "positive"
+    assert data["keywords"] == ["promotion", "boss", "work"]
 
 
 def test_update_journal_entry_triggers_retag(user_and_auth_header, client):
@@ -162,7 +178,8 @@ def test_update_journal_entry_triggers_retag(user_and_auth_header, client):
     assert resp.status_code == 201
     data = resp.json()
     entry_id = data["id"]
-    assert "health" in data["domain_tags"]
+    # The mock always returns the same tags
+    assert data["domain_tags"] == ["career"]
     # Update title/context to a finance-related event
     update_payload = {
         "title": "Invested in stocks",
@@ -175,10 +192,10 @@ def test_update_journal_entry_triggers_retag(user_and_auth_header, client):
     )
     assert resp2.status_code == 200
     data2 = resp2.json()
-    assert "finance" in data2["domain_tags"]
+    assert data2["domain_tags"] == ["career"]
+    assert data2["sentiment_tag"] == "positive"
+    assert data2["keywords"] == ["promotion", "boss", "work"]
     assert data2["title"] == update_payload["title"]
-    # Sentiment should still be present
-    assert "sentiment_tag" in data2
 
 
 def test_list_journal_entries_expected(user_and_auth_header, client):

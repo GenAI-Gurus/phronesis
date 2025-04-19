@@ -1,6 +1,7 @@
 """
 Add auto-tagging fields to DecisionJournalEntry (domain_tags, sentiment_tag, keywords)
 """
+
 from alembic import op
 import sqlalchemy as sa
 

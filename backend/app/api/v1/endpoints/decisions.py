@@ -8,7 +8,7 @@ from app.models.reflection import DecisionChatMessage
 from app.db.session import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.services.auto_tagger import AutoTagger
+from app.services.auto_tagger import OpenAITagger
 from app.schemas.decision_journal import (
     DecisionJournalEntryCreate,
     DecisionJournalEntryUpdate,
@@ -37,7 +37,7 @@ def create_decision_journal_entry(
     Returns:
         DecisionJournalEntry: The created entry.
     """
-    tag_result = AutoTagger.tag_entry(entry_in.title, entry_in.context)
+    tag_result = OpenAITagger.tag_entry(entry_in.title, entry_in.context)
     entry = DecisionJournalEntry(
         id=str(uuid.uuid4()),
         user_id=str(current_user.id),
@@ -363,7 +363,7 @@ def update_decision_journal_entry(
         setattr(entry, field, value)
     # Re-run auto-tagging if title or context is updated
     if "title" in data or "context" in data:
-        tag_result = AutoTagger.tag_entry(
+        tag_result = OpenAITagger.tag_entry(
             data.get("title", entry.title), data.get("context", entry.context)
         )
         entry.domain_tags = tag_result["domain_tags"]
