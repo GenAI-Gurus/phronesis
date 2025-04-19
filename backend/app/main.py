@@ -61,6 +61,14 @@ app.include_router(
     tags=["decision-support"],
 )
 
+from app.api.v1.endpoints import future_self
+
+app.include_router(
+    future_self.router,
+    prefix="/api/v1/future-self",
+    tags=["future-self"],
+)
+
 
 @app.get("/")
 def read_root():

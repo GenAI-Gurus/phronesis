@@ -12,6 +12,8 @@ import ValueCalibrationPage from '../pages/ValueCalibrationPage';
 import ReflectionPage from '../pages/ReflectionPage';
 import ReflectionPromptPage from '../pages/ReflectionPromptPage';
 import ChallengesPage from '../pages/ChallengesPage';
+import FutureSelfSimulatorPage from '../pages/FutureSelfSimulatorPage';
+import ProgressVisualizationPage from '../pages/ProgressVisualizationPage';
 
 const AppRouter: React.FC = () => (
   <Router>
@@ -27,6 +29,7 @@ const AppRouter: React.FC = () => (
       <Route path="/reflection" element={<ReflectionPage />} />
       <Route path="/reflection-prompts" element={<ReflectionPromptPage />} />
       <Route path="/challenges" element={<ChallengesPage />} />
+<Route path="/future-self" element={<FutureSelfSimulatorPage />} />
       <Route path="*" element={<LoginPage />} />
     </Routes>
   </Router>

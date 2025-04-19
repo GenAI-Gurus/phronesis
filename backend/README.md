@@ -4,7 +4,7 @@ A modular, expandable, and AI-friendly backend for the Phronesis platform, built
 
 ---
 
-## Decision Chat Endpoints (MVP)
+## Decision Chat Endpoints (MVP)\n\n## Future-Self Simulator API\n\n- **POST /api/v1/future-self/simulate**\n- **Auth:** Required (JWT Bearer)\n- **Purpose:** AI-powered simulation of user's likely \"future self\" based on a decision context, values, and optional time horizon.\n\n### Request Schema\n```json\n{\n  \"decision_context\": \"Should I move to a new city for a job opportunity?\",\n  \"values\": [\"growth\", \"security\"],\n  \"time_horizon\": \"2 years\"\n}\n```\n\n### Response Schema\n```json\n{\n  \"future_projection\": \"In two years, after moving to the new city, you have grown professionally and expanded your network. The transition was challenging at first, but you adapted and found new sources of security and fulfillment.\",\n  \"suggestions\": [\n    \"Research neighborhoods and cost of living.\",\n    \"Connect with local professional groups before moving.\",\n    \"Reflect on what you need to feel secure during transitions.\"\n  ],\n  \"ai_generated\": true\n}\n```\n\n- **Summary:** Simulate your “future self” based on a decision context and values.\n- **Description:** Uses AI to project a narrative of your likely future self given a specific decision, values, and optional time horizon.\n- **Tags:** [\"future-self\", \"simulation\", \"decision support\"]\n
 
 - **Create Session:** `POST /api/v1/decisions/sessions` — `{ "title": string }` → `{ "id": UUID, ... }`
 - **List Sessions:** `GET /api/v1/decisions/sessions`
