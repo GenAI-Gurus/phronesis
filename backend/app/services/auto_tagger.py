@@ -7,6 +7,7 @@ Auto Tagging and Categorization Service for Decision Journal Entries.
 
 Dependencies: textblob, rake-nltk
 """
+
 from typing import List, Optional, Dict
 from textblob import TextBlob
 from rake_nltk import Rake
