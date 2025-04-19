@@ -91,7 +91,7 @@ def generate_reflection_prompts(
             if entry.domain:
                 user_content += f"Domain: {entry.domain}\n"
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4.1-nano",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_content},

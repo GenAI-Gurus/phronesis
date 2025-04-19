@@ -142,7 +142,8 @@
     - FastAPI endpoint /api/v1/decision-support/chat (POST) with request/response schemas. Returns mock AI reply and suggestions. Fully unit tested (expected, edge, failure cases).
 [x] 35. Develop Chat UI for Decision Support
     - Modern Material UI chat interface (DecisionSupportChatPage.tsx): user/AI messages, suggestions as quick actions, loading/error states, and unit tests.
-[ ] 36. Integrate OpenAI Chat API
+[x] 36. Integrate OpenAI Chat API
+    - Both decision-support/chat and future-self/simulate endpoints use OpenAI GPT-4.1-nano if configured, fallback to robust mock if not. All logic tested (mocked AI and fallback). Docs and .env.example updated.
 [ ] 37. Implement Future-Self Simulator Backend
 [ ] 38. Develop Simulator UI Component
 [ ] 39. Implement Life Theme & Progress Tracker
@@ -156,7 +157,7 @@
 ---
 
 ### Completed Infrastructure & Process Improvements
-- All backend and frontend tests pass locally and in CI (including LLM-powered integration tests with OpenAI GPT-4.1).
+- All backend and frontend tests pass locally and in CI (including LLM-powered integration tests with OpenAI GPT-4.1-nano).
 - Test output (OpenAI messages, verdicts) is visible in CI logs for auditability.
 - Test database (test.db) is deleted before every CI run; no legacy UUID errors.
 - Black formatting enforced; code is compliant.

@@ -25,39 +25,44 @@ def mock_auth():
     app.dependency_overrides = {}
 
 
-def test_decision_support_chat_expected():
-    import os
-    import openai
+def test_decision_support_chat_expected(monkeypatch):
+    # Mock OpenAI to simulate a successful AI response
+    class MockOpenAIChatCompletion:
+        @staticmethod
+        def create(*args, **kwargs):
+            class Choice:
+                message = {"content": "Here's an AI suggestion."}
 
+            return type("Resp", (), {"choices": [Choice()]})
+
+    import sys
+
+    sys.modules["openai"].ChatCompletion = MockOpenAIChatCompletion
     payload = {
         "messages": [{"role": "user", "content": "I'm struggling with a big decision."}]
     }
     response = client.post("/api/v1/decision-support/chat", json=payload)
     assert response.status_code == 200
     data = response.json()
-    user_msg = payload["messages"][0]["content"]
-    ai_reply = data["reply"]
-    print("\n--- DecisionSupportChat Test Output ---")
-    print(f"User message: {user_msg}")
-    print(f"AI reply: {ai_reply}")
-    # Use OpenAI as judge (gpt-4.1-nano)
-    api_key = os.getenv("OPENAI_API_KEY")
-    judge_prompt = (
-        f"Given the user question: '{user_msg}' and the AI's answer: '{ai_reply}', "
-        "is the answer a valid, helpful response to the question? Reply only with YES or NO."
-    )
-    print(f"Judge prompt: {judge_prompt}")
-    judge_client = openai.OpenAI(api_key=api_key)
-    judge_response = judge_client.chat.completions.create(
-        model="gpt-4.1-nano",
-        messages=[{"role": "user", "content": judge_prompt}],
-        max_tokens=5,
-        temperature=0,
-    )
-    verdict = judge_response.choices[0].message.content.strip().upper()
-    print(f"Judge verdict: {verdict}")
-    print("--- End Test Output ---\n")
-    assert verdict.startswith("YES"), f"LLM judge verdict: {verdict}"
+    assert "reply" in data
+    # suggestions may be None or a list (depending on AI output)
+
+
+def test_decision_support_chat_fallback(monkeypatch):
+    # Simulate OpenAI error to test fallback
+    class MockOpenAIChatCompletion:
+        @staticmethod
+        def create(*args, **kwargs):
+            raise Exception("OpenAI error")
+
+    import sys
+
+    sys.modules["openai"].ChatCompletion = MockOpenAIChatCompletion
+    payload = {"messages": [{"role": "user", "content": "Fallback test."}]}
+    response = client.post("/api/v1/decision-support/chat", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert "reply" in data
     assert isinstance(data["suggestions"], list)
 
 

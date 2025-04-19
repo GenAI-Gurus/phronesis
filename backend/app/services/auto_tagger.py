@@ -11,7 +11,7 @@ import openai
 from fastapi import HTTPException
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4-1106-preview")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-nano")
 
 AUTO_TAG_FUNCTION = {
     "name": "auto_tag_journal_entry",

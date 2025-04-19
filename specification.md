@@ -25,7 +25,7 @@ The platform should feel warm and supportive, offering encouragement and empathy
 ## AI-Powered Reflection Prompts
 
 - **Endpoint:** `POST /api/v1/reflection/prompts/generate`
-- **Purpose:** Generate personalized reflection prompts for a decision journal entry using OpenAI GPT-3.5-turbo (if `OPENAI_API_KEY` is set).
+- **Purpose:** Generate personalized reflection prompts for a decision journal entry using OpenAI GPT-4.1-nano (if `OPENAI_API_KEY` is set).
 - **Request:**
   ```json
   {

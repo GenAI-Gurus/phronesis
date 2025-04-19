@@ -8,6 +8,26 @@ A modular, expandable, and AI-friendly backend for the Phronesis platform, built
 
 ## Gamification API
 
+## OpenAI Integration (Decision Support & Future-Self Simulator)
+
+- **Endpoints:**
+  - `/api/v1/decision-support/chat` (POST)
+  - `/api/v1/future-self/simulate` (POST)
+- **AI Model:** OpenAI GPT-4.1-nano (configurable via `OPENAI_API_KEY`)
+- **How it works:**
+  - If `OPENAI_API_KEY` is set, requests are sent to OpenAI for AI-powered responses.
+  - If the API key is missing or OpenAI is unavailable, endpoints return a robust mock response with fallback suggestions.
+  - No request/response schema changes—frontend remains compatible.
+- **Environment Variable:**
+  - `OPENAI_API_KEY` (required for live AI)
+- **Testing:**
+  - Pytest unit tests mock OpenAI for both success and failure.
+  - Tests verify both AI and fallback logic.
+- **Security:**
+  - API key is never hardcoded; always loaded from environment/config.
+  - All endpoints require authentication.
+
+
 - **GET /api/v1/gamification/streaks**
   - Returns current user streaks (e.g., check-in streaks)
   - **Response:**
