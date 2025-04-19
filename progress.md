@@ -129,26 +129,26 @@
 [ ] 28. Develop UI for Reflection Prompts
 [x] 29. Implement Auto Tagging and Categorization  
     *Now uses OpenAI LLM with function calling. All legacy NLP code and dependencies removed. Pytest unit tests—including edge and failure cases (e.g., OpenAI down)—are now complete and passing. Tests updated to mock OpenAI and simulate API failure.*
-[ ] 30. Develop API for Value Calibration
-[ ] 31. Create Value Calibration Data Model
+[x] 30. Develop API for Value Calibration
+[x] 31. Create Value Calibration Data Model
 [x] 32. Design Value Calibration UI
-[ ] 29. Develop API for Value Calibration
-[ ] 30. Create Value Calibration Data Model
-[x] 31. Design Value Calibration UI
     - Interactive UI with sliders for core values (Courage, Honesty, Curiosity, Empathy, Resilience), validation, feedback, and unit tests implemented in ValueCalibrationPage.tsx.
-[x] 32. Implement Tension Detector Logic
+    - Backend endpoints (`POST`/`GET` /api/v1/value-calibration/checkins), Pydantic schemas, robust Pytest coverage (expected, edge, failure cases).
+    - Frontend API integration (`src/api/valueCalibration.ts`), check-in history, error/loading states, accessibility.
+    - Comprehensive Vitest + RTL tests, including initialValues prop for robust validation.
+[x] 33. Implement Tension Detector Logic
     - Backend service detects value conflicts and rapid swings in user check-ins. Comprehensive unit tests (expected, edge, failure cases) in test_tension_detector.py.
-[x] 33. Build Decision Support Chat API
+[x] 34. Build Decision Support Chat API
     - FastAPI endpoint /api/v1/decision-support/chat (POST) with request/response schemas. Returns mock AI reply and suggestions. Fully unit tested (expected, edge, failure cases).
-[x] 34. Develop Chat UI for Decision Support
+[x] 35. Develop Chat UI for Decision Support
     - Modern Material UI chat interface (DecisionSupportChatPage.tsx): user/AI messages, suggestions as quick actions, loading/error states, and unit tests.
-[ ] 35. Integrate OpenAI Chat API
-[ ] 36. Implement Future-Self Simulator Backend
-[ ] 37. Develop Simulator UI Component
-[ ] 38. Implement Life Theme & Progress Tracker
-[ ] 39. Develop Progress Visualization UI
-[ ] 40. Create Gamification Module (Backend)
-[ ] 41. Develop Gamification UI Elements
+[ ] 36. Integrate OpenAI Chat API
+[ ] 37. Implement Future-Self Simulator Backend
+[ ] 38. Develop Simulator UI Component
+[ ] 39. Implement Life Theme & Progress Tracker
+[ ] 40. Develop Progress Visualization UI
+[ ] 41. Create Gamification Module (Backend)
+[ ] 42. Develop Gamification UI Elements
 
 ---
 

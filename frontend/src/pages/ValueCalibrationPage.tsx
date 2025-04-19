@@ -1,5 +1,5 @@
 // src/pages/ValueCalibrationPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -8,7 +8,10 @@ import {
   Button,
   Alert,
   Stack,
+  CircularProgress,
+  Divider,
 } from '@mui/material';
+import { createValueCalibrationCheckin, listValueCalibrationCheckins, ValueCalibrationCheckin } from '../api/valueCalibration';
 
 const VALUE_LIST = [
   'Courage',
@@ -21,13 +24,38 @@ const VALUE_LIST = [
 const min = 1;
 const max = 10;
 
-const ValueCalibrationPage: React.FC = () => {
+interface ValueCalibrationPageProps {
+  initialValues?: { [key: string]: number };
+}
+
+const ValueCalibrationPage: React.FC<ValueCalibrationPageProps> = ({ initialValues }) => {
   const [values, setValues] = useState<{ [key: string]: number }>(
-    Object.fromEntries(VALUE_LIST.map((v) => [v, 5]))
+    initialValues || Object.fromEntries(VALUE_LIST.map((v) => [v, 5]))
   );
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<ValueCalibrationCheckin[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchHistory();
+    // eslint-disable-next-line
+  }, []);
+
+  const fetchHistory = async () => {
+    setHistoryLoading(true);
+    setHistoryError(null);
+    try {
+      const data = await listValueCalibrationCheckins();
+      setHistory(data);
+    } catch (err: any) {
+      setHistoryError('Failed to load check-in history.');
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
 
   const handleSliderChange = (name: string) => (_: Event, newValue: number | number[]) => {
     setValues((prev) => ({ ...prev, [name]: newValue as number }));
@@ -39,16 +67,15 @@ const ValueCalibrationPage: React.FC = () => {
     e.preventDefault();
     setSuccess(false);
     setError(null);
-    // Validate all values are set
     if (Object.values(values).some((v) => v < min || v > max)) {
       setError('All values must be rated between 1 and 10.');
       return;
     }
     setSubmitting(true);
     try {
-      // Mock API call
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await createValueCalibrationCheckin(values);
       setSuccess(true);
+      fetchHistory(); // refresh history
     } catch {
       setError('Failed to submit value calibration.');
     } finally {
@@ -94,6 +121,39 @@ const ValueCalibrationPage: React.FC = () => {
             </Button>
           </Stack>
         </form>
+        <Divider sx={{ my: 4 }} />
+        <Typography variant="h6" mb={2}>Check-in History</Typography>
+        {historyLoading ? (
+          <CircularProgress aria-label="Loading check-in history" />
+        ) : historyError ? (
+          <Alert severity="error">{historyError}</Alert>
+        ) : !history || history.length === 0 ? (
+          <Typography color="text.secondary">No previous check-ins.</Typography>
+        ) : (
+          <Stack spacing={2} mt={2}>
+            {history.map((c) => {
+              let snapshot: Record<string, number> = {};
+              try { snapshot = JSON.parse(c.value_snapshot); } catch {}
+              return (
+                <Paper key={c.id} sx={{ p: 2, bgcolor: '#fafafa' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {new Date(c.created_at).toLocaleString()}
+                  </Typography>
+                  <Stack direction="row" spacing={2} mt={1}>
+                    {VALUE_LIST.map((v) => (
+                      <Box key={v}>
+                        <Typography variant="caption">{v}</Typography>
+                        <Typography variant="body2" fontWeight={600} data-testid={`history-value-${v}`}>
+                          {snapshot[v] ?? '-'}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Paper>
+              );
+            })}
+          </Stack>
+        )}
       </Paper>
     </Box>
   );

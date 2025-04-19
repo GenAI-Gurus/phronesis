@@ -45,6 +45,14 @@ app.include_router(
     tags=["reflection"],
 )
 
+from app.api.v1.endpoints import value_calibration
+
+app.include_router(
+    value_calibration.router,
+    prefix="/api/v1/value-calibration",
+    tags=["value-calibration"],
+)
+
 from app.api.v1.endpoints import decision_support
 
 app.include_router(

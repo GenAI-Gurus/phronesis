@@ -438,6 +438,33 @@ FE -> User : Show Dashboard
 ## User Journey Diagrams
 
 ### 1. Decision Logging & Reflection Flow
+
+---
+
+### Value Calibration
+
+#### Backend
+- **Endpoints:**
+  - `POST /api/v1/value-calibration/checkins` – Create a value calibration check-in (requires auth)
+  - `GET /api/v1/value-calibration/checkins` – List all check-ins for the user
+- **Schemas:** Pydantic models for request/response, including `value_snapshot` (JSON string of values)
+- **Testing:** Pytest unit tests for expected, edge, and failure cases; test DB setup fixture ensures reliable schema
+
+#### Frontend
+- **UI:** Modern React + Material UI page with sliders for Courage, Honesty, Curiosity, Empathy, Resilience
+- **Features:**
+  - User rates each value (1–10)
+  - Submits check-in to backend
+  - Displays check-in history (with values and timestamps)
+  - Robust error/loading/empty states
+  - Accessible and responsive design
+- **API Integration:**
+  - `src/api/valueCalibration.ts` for all API calls
+- **Testing:**
+  - Comprehensive Vitest + RTL tests
+  - Uses `initialValues` prop for robust validation testing (no brittle UI event simulation)
+  - Covers success, edge, and failure cases
+
 ```plantuml
 @startuml
 actor User

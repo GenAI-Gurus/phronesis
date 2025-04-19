@@ -21,3 +21,7 @@ class ValueCalibrationCheckinRead(ValueCalibrationCheckinBase):
 
     class Config:
         orm_mode = True
+
+
+# Alias for API response
+ValueCalibrationCheckinOut = ValueCalibrationCheckinRead
