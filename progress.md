@@ -127,7 +127,8 @@
 [ ] 26. Implement Reflection Prompt Generator Endpoint
 [ ] 27. Integrate OpenAI API for Prompts
 [ ] 28. Develop UI for Reflection Prompts
-[ ] 29. Implement Auto Tagging and Categorization
+[x] 29. Implement Auto Tagging and Categorization  
+    *Now uses OpenAI LLM with function calling. All legacy NLP code and dependencies removed. Tests updated to mock OpenAI.*
 [ ] 30. Develop API for Value Calibration
 [ ] 31. Create Value Calibration Data Model
 [x] 32. Design Value Calibration UI

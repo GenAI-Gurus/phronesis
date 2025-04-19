@@ -198,41 +198,75 @@ The backend is deployed to Azure App Service using a custom Docker image, which 
 Automatically assign relevant tags and categories to each decision journal entry, improving search, analytics, and personalized insights for users.
 
 ### Scope
+- **Domain tags**: List of relevant domains (e.g., career, health, relationships, finance, personal growth)
+- **Sentiment tag**: One of "positive", "neutral", or "negative"
+- **Keywords**: List of 3–7 keywords summarizing the entry
 
-**Tag Types:**
-- **Domain Tags:** (e.g., Career, Health, Relationships, Finance, Personal Growth)
-- **Sentiment Tags:** (e.g., Positive, Negative, Neutral)
-- **Custom/AI Tags:** Extracted keywords or topics (e.g., “promotion”, “family”, “risk”)
+### Implementation: OpenAI LLM-based Tagging
 
-**Trigger:**
-- Auto-tagging occurs on journal entry creation and update.
+#### Overview
+- All auto-tagging is performed by calling the OpenAI API (GPT-4.1-nano).
+- The backend sends the journal entry’s title and context to the LLM with a structured function-calling request.
+- The LLM is instructed to return a JSON object with:
+  - `domain_tags` (list of strings)
+  - `sentiment_tag` (string)
+  - `keywords` (list of strings)
+- If the OpenAI API key is not configured, the endpoint will return a 503 error or a clear fallback response.
 
-**Implementation Approach:**
-- **Domain Tagging:** Use simple rules (keyword matching in title/context) and/or a lightweight NLP model to assign one or more domains.
-- **Sentiment Analysis:** Use a Python NLP library (e.g., TextBlob, Vader) for sentiment scoring.
-- **Keyword Extraction:** Use RAKE, spaCy, or similar to extract salient keywords as additional tags.
+#### OpenAI Function Calling (Recommended)
+- The backend uses OpenAI’s function calling feature to guarantee the response format.
+- The function schema is:
+  ```json
+  {
+    "name": "auto_tag_journal_entry",
+    "description": "Auto-tag a decision journal entry with domains, sentiment, and keywords.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "domain_tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Relevant domains (e.g., career, health, relationships, finance, personal_growth)"
+        },
+        "sentiment_tag": {
+          "type": "string",
+          "enum": ["positive", "neutral", "negative"],
+          "description": "Overall sentiment of the entry"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Key topics or concepts from the entry"
+        }
+      },
+      "required": ["domain_tags", "sentiment_tag", "keywords"]
+    }
+  }
+  ```
+- The backend parses the returned function call arguments and stores them in the database.
 
-**Data Model Changes:**
-- Extend the DecisionJournalEntry model to include:
-  - `domain_tags: List[str]`
-  - `sentiment_tag: str`
-  - `keywords: List[str]`
+#### Example Prompt
+> "Given the following decision journal entry, extract the most relevant domains (career, health, relationships, finance, personal growth), sentiment (positive/neutral/negative), and 3-7 keywords. Respond in the specified JSON format."
 
-**API Changes:**
-- On POST/PUT to the journal entry endpoint, auto-tagging logic will run and update the entry with tags.
-- Tags are returned in the API response and stored in the database.
+#### API/Service Changes
+- The `AutoTagger` service is replaced with a new implementation that calls OpenAI and parses the function call result.
+- All references to NLTK, TextBlob, and RAKE are removed from the codebase and dependencies.
+- Tests are updated to mock OpenAI responses for consistent results in CI/CD.
 
-**Testing:**
-- Pytest unit tests for:
-  - Correct tagging for expected cases (clear domains, strong sentiment)
-  - Edge cases (ambiguous or mixed-content entries)
-  - Failure cases (empty or nonsense input)
+#### Security & Privacy
+- The OpenAI API key is required for tagging.
+- Journal entry content is sent to OpenAI; ensure this is documented and disclosed to users.
+- If the API key is missing, tagging is unavailable and the API returns a 503 error.
 
-**Extensibility:**
-- Design tagging logic as a service/module for easy future replacement with more advanced AI/LLM-based tagging.
+#### Testing
+- Unit tests mock the OpenAI API and validate that the backend correctly parses and stores tags.
+- Tests cover expected, edge, and failure cases (e.g., API errors, malformed responses).
+
+#### Extensibility
+- The tagging schema and prompt can be easily updated for new domains or output fields.
+- The implementation can be switched to another LLM provider with minimal changes.
 
 ---
-
 
 ## Competitive Edge
 - No specific competitors or benchmarks targeted at this stage; focus on unique positioning through user-centric design and empathetic support.
