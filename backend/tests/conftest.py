@@ -60,7 +60,8 @@ def db_engine():
     print("[conftest] Disposing engine after session.")
     engine.dispose()
     print("[conftest] Engine disposed.")
-    # Clean up test DB file after tests
+    # For SQLite test DB, do NOT drop tables here. Only remove test.db file after engine is disposed.
+    # This avoids locking/readonly errors on teardown.
     import sqlite3
 
     try:
@@ -84,6 +85,11 @@ def db_engine():
                     print("[conftest] test.db removed after tests.")
                     break
                 except (PermissionError, sqlite3.OperationalError) as e:
+                    if "readonly database" in str(e):
+                        print(
+                            f"[conftest] Ignored teardown error (readonly database): {e}"
+                        )
+                        break
                     print(f"[conftest] Retry {i+1}: Could not remove test.db: {e}")
                     time.sleep(0.5)
             else:

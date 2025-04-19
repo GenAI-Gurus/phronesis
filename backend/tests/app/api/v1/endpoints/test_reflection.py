@@ -41,8 +41,8 @@ def setup_test_db():
     UserBase.metadata.create_all(bind=engine)
     DecisionBase.metadata.create_all(bind=engine)
     yield
-    DecisionBase.metadata.drop_all(bind=engine)
-    UserBase.metadata.drop_all(bind=engine)
+    # DB cleanup is now handled centrally in tests/conftest.py to avoid SQLite locking/readonly errors.
+    # Do not drop tables here.
 
 
 @pytest.fixture(scope="module")

@@ -16,8 +16,8 @@ def setup_test_db():
     UserBase.metadata.create_all(bind=engine)
     ValueCalibrationBase.metadata.create_all(bind=engine)
     yield
-    UserBase.metadata.drop_all(bind=engine)
-    ValueCalibrationBase.metadata.drop_all(bind=engine)
+    # DB cleanup is now handled centrally in tests/conftest.py to avoid SQLite locking/readonly errors.
+    # Do not drop tables here.
 
 
 client = TestClient(app)

@@ -38,21 +38,8 @@ def setup_test_db():
     ValueCalibrationBase.metadata.create_all(bind=engine)
     GamificationBase.metadata.create_all(bind=engine)
     yield
-    # Only drop tables and remove test.db if the file exists (prevents readonly error)
-    db_path = os.path.join(
-        os.path.dirname(__file__), "../../../../../../backend/test.db"
-    )
-    if os.path.exists(db_path):
-        GamificationBase.metadata.drop_all(bind=engine)
-        ValueCalibrationBase.metadata.drop_all(bind=engine)
-        ReflectionBase.metadata.drop_all(bind=engine)
-        DecisionBase.metadata.drop_all(bind=engine)
-        UserBase.metadata.drop_all(bind=engine)
-        try:
-            os.chmod(db_path, 0o666)
-            os.remove(db_path)
-        except Exception as e:
-            print(f"[teardown] Could not remove test.db: {e}")
+    # DB cleanup is now handled centrally in tests/conftest.py to avoid SQLite locking/readonly errors.
+    # Do not drop tables or remove test.db here.
 
 
 import uuid
