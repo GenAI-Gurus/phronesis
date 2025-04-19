@@ -47,6 +47,9 @@ jobs:
         run: rm -f backend/test.db
       - name: Show backend dir after DB cleanup
         run: ls -l
+      - name: Download NLTK stopwords
+        run: poetry run python -m nltk.downloader stopwords
+
       - name: Run backend tests (pytest)
         run: PYTHONPATH=. poetry run pytest --maxfail=1 --disable-warnings --tb=short -s
 
