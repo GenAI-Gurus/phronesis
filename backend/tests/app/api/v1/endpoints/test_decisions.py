@@ -114,6 +114,45 @@ def mock_openai_chatcompletion(monkeypatch):
     monkeypatch.setattr("openai.ChatCompletion.create", fake_create)
 
 
+def test_create_journal_entry_openai_failure(monkeypatch, user_and_auth_header, client):
+    """
+    Failure: Simulate OpenAI API failure during auto-tagging and verify fallback/error handling.
+    Ensures robust edge/failure case coverage (see global rules).
+
+    Args:
+        monkeypatch: Pytest monkeypatch fixture.
+        user_and_auth_header: Tuple with user_id and auth header.
+        client: FastAPI test client.
+    """
+
+    def fail_create(*args, **kwargs):
+        raise RuntimeError("OpenAI API unavailable")
+
+    monkeypatch.setattr("openai.ChatCompletion.create", fail_create)
+    _, auth_header = user_and_auth_header
+    payload = {
+        "title": "Entry with OpenAI down",
+        "context": "Testing OpenAI failure.",
+        "anticipated_outcomes": "Should fallback or error",
+        "values": ["integrity"],
+    }
+    response = client.post(
+        "/api/v1/decisions/journal", json=payload, headers=auth_header
+    )
+    # Accept either fallback tags or a clear error, depending on implementation
+    assert response.status_code in (201, 503, 200)
+    data = response.json()
+    # Check for fallback or error message
+    assert (
+        "domain_tags" in data or "detail" in data
+    ), "Should return fallback tags or error detail."
+    if "domain_tags" in data:
+        assert isinstance(data["domain_tags"], list)
+    if "detail" in data:
+        assert "OpenAI" in data["detail"] or "unavailable" in data["detail"].lower()
+    # Reason: Global rule requires explicit edge/failure case tests for reliability.
+
+
 def test_create_journal_entry_expected(user_and_auth_header, client):
     _, auth_header = user_and_auth_header
     payload = {

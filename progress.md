@@ -121,14 +121,14 @@
 - [x] Implement Decision Journal Entry listing and update endpoints  
     *Backend endpoints for listing and updating Decision Journal Entries implemented and fully tested (Pytest).*
 [x] 24. Build Decision Journal Form UI  
-    *Modern React UI at /journal for listing, creating, and editing entries. Modular components, robust error handling, and full unit test coverage (Vitest/RTL).*
+    *Modern React UI at /journal for listing, creating, viewing details, and editing entries. Modular components, robust error handling, and full unit test coverage (Vitest/RTL). Users can now create, view, and edit entries with AI-generated tags. All backend and frontend integration complete and tested.*
 
 [ ] 25. Integrate Speech-to-Text (Optional)
 [ ] 26. Implement Reflection Prompt Generator Endpoint
 [ ] 27. Integrate OpenAI API for Prompts
 [ ] 28. Develop UI for Reflection Prompts
 [x] 29. Implement Auto Tagging and Categorization  
-    *Now uses OpenAI LLM with function calling. All legacy NLP code and dependencies removed. Tests updated to mock OpenAI.*
+    *Now uses OpenAI LLM with function calling. All legacy NLP code and dependencies removed. Pytest unit tests—including edge and failure cases (e.g., OpenAI down)—are now complete and passing. Tests updated to mock OpenAI and simulate API failure.*
 [ ] 30. Develop API for Value Calibration
 [ ] 31. Create Value Calibration Data Model
 [x] 32. Design Value Calibration UI

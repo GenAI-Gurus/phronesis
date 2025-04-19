@@ -5,7 +5,9 @@ import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import DashboardPage from '../pages/DashboardPage';
 import NewDecisionPage from '../pages/NewDecisionPage';
-import DecisionJournalPage from '../pages/DecisionJournalPage';
+import JournalListPage from '../pages/JournalListPage';
+import JournalDetailPage from '../pages/JournalDetailPage';
+import EditJournalEntryPage from '../pages/EditJournalEntryPage';
 import ValueCalibrationPage from '../pages/ValueCalibrationPage';
 import ReflectionPage from '../pages/ReflectionPage';
 import ReflectionPromptPage from '../pages/ReflectionPromptPage';
@@ -17,8 +19,10 @@ const AppRouter: React.FC = () => (
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/journal" element={<DecisionJournalPage />} />
+      <Route path="/journal" element={<JournalListPage />} />
       <Route path="/journal/new" element={<NewDecisionPage />} />
+      <Route path="/journal/:id" element={<JournalDetailPage />} />
+      <Route path="/journal/:id/edit" element={<EditJournalEntryPage />} />
       <Route path="/value-calibration" element={<ValueCalibrationPage />} />
       <Route path="/reflection" element={<ReflectionPage />} />
       <Route path="/reflection-prompts" element={<ReflectionPromptPage />} />
