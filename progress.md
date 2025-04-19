@@ -144,9 +144,12 @@
     - Modern Material UI chat interface (DecisionSupportChatPage.tsx): user/AI messages, suggestions as quick actions, loading/error states, and unit tests.
 [x] 36. Integrate OpenAI Chat API
     - Both decision-support/chat and future-self/simulate endpoints use OpenAI GPT-4.1-nano if configured, fallback to robust mock if not. All logic tested (mocked AI and fallback). Docs and .env.example updated.
-[ ] 37. Implement Future-Self Simulator Backend
-[ ] 38. Develop Simulator UI Component
-[ ] 39. Implement Life Theme & Progress Tracker
+[x] 37. Implement Future-Self Simulator Backend
+    - Endpoint implemented, uses OpenAI GPT-4.1-nano with robust fallback. Fully tested and documented.
+[x] 38. Develop Simulator UI Component
+    - Frontend UI complete: form, API integration, result display, error/loading states. Fully tested (expected, edge, failure cases).
+[x] 39. Implement Life Theme & Progress Tracker
+    - Backend endpoints, model, and Pytest tests implemented. Frontend UI, API client, route, and Vitest tests complete. Dashboard card and navigation link added for discoverability.
 [x] 40. Develop Progress Visualization UI
     - /progress page implemented with Material UI and Recharts. Visualizes value trends and decision activity using real backend data. Fully tested (expected, edge, failure cases) with ResizeObserver polyfill for chart compatibility in Vitest.
 [x] 41. Create Gamification Module (Backend)

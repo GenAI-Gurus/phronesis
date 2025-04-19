@@ -10,6 +10,43 @@ A modular, expandable, and AI-friendly backend for the Phronesis platform, built
 
 ## OpenAI Integration (Decision Support & Future-Self Simulator)
 
+## Future-Self Simulator (Backend & UI)
+
+## Life Theme API
+
+- **Endpoints:**
+  - `GET /api/v1/life-theme` — Get the current user's life theme (most recent)
+  - `POST /api/v1/life-theme` — Set a new life theme (creates new, does not overwrite previous)
+- **Request Example:**
+  ```json
+  { "theme_text": "Growth through challenge" }
+  ```
+- **Response Example:**
+  ```json
+  {
+    "id": "...",
+    "theme_text": "Growth through challenge",
+    "created_at": "2025-04-19T22:00:00Z",
+    "updated_at": "2025-04-19T22:00:00Z"
+  }
+  ```
+- **Auth:** Required (JWT Bearer)
+- **Testing:** Pytest covers expected, edge, and failure cases
+- **Docs:** See `specification.md` for data model and UX
+
+
+- **Endpoint:** `POST /api/v1/future-self/simulate`
+- **Purpose:** Simulate a user's likely future self based on decision context, values, and time horizon. Uses OpenAI GPT-4.1-nano with fallback logic.
+- **Frontend:** `/future-self` page (React/Material UI)
+  - Form for context, values, time horizon
+  - Calls backend, displays AI projection and suggestions
+  - Handles loading, error, and empty states
+- **Testing:**
+  - Backend: Pytest with OpenAI mocked for both AI and fallback
+  - Frontend: Vitest + RTL for all UI/UX logic
+- **Docs:** See `specification.md` for request/response schema and UX details
+
+
 - **Endpoints:**
   - `/api/v1/decision-support/chat` (POST)
   - `/api/v1/future-self/simulate` (POST)

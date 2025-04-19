@@ -24,6 +24,72 @@ The platform should feel warm and supportive, offering encouragement and empathy
 
 ## AI-Powered Reflection Prompts
 
+## Future-Self Simulator
+
+## Life Theme
+
+- **Model:**
+  - `LifeTheme`: id, user_id, theme_text, created_at, updated_at
+  - One active theme per user (history preserved)
+- **Endpoints:**
+  - `GET /api/v1/life-theme`: Get user's current (latest) life theme
+  - `POST /api/v1/life-theme`: Set a new life theme (creates new, does not overwrite previous)
+- **Request Example:**
+  ```json
+  { "theme_text": "Growth through challenge" }
+  ```
+- **Response Example:**
+  ```json
+  {
+    "id": "...",
+    "theme_text": "Growth through challenge",
+    "created_at": "2025-04-19T22:00:00Z",
+    "updated_at": "2025-04-19T22:00:00Z"
+  }
+  ```
+- **Frontend UX:**
+  - `/life-theme` page or dashboard card
+  - Show current theme and last updated date
+  - Edit/add theme with confirmation before overwrite
+  - (Optional) AI suggestions for new themes
+- **Testing:**
+  - Backend: Pytest for expected, edge, and failure cases
+  - Frontend: Vitest + RTL for UI/UX
+
+
+- **Backend Endpoint:** `POST /api/v1/future-self/simulate`
+- **Purpose:** Simulate a user's likely future self based on a decision context, values, and optional time horizon. Uses OpenAI GPT-4.1-nano if configured, with robust fallback logic if not.
+- **Request Example:**
+  ```json
+  {
+    "decision_context": "Should I move to a new city for a job opportunity?",
+    "values": ["growth", "security"],
+    "time_horizon": "2 years"
+  }
+  ```
+- **Response Example:**
+  ```json
+  {
+    "future_projection": "In two years, after moving to the new city, you have grown professionally and expanded your network. The transition was challenging at first, but you adapted and found new sources of security and fulfillment.",
+    "suggestions": [
+      "Research neighborhoods and cost of living.",
+      "Connect with local professional groups before moving.",
+      "Reflect on what you need to feel secure during transitions."
+    ],
+    "ai_generated": true
+  }
+  ```
+- **Frontend:** `/future-self` page
+  - Modern Material UI form for context, values, and time horizon
+  - Calls backend, displays AI projection and suggestions
+  - Handles loading, error, and empty states
+  - Fully tested with Vitest (expected, edge, failure cases)
+- **Testing:**
+  - Backend: Pytest with OpenAI mocked for both AI and fallback
+  - Frontend: Vitest + RTL for all UI/UX logic
+- **Docs:** See backend/README.md for API and environment details
+
+
 - **Endpoint:** `POST /api/v1/reflection/prompts/generate`
 - **Purpose:** Generate personalized reflection prompts for a decision journal entry using OpenAI GPT-4.1-nano (if `OPENAI_API_KEY` is set).
 - **Request:**

@@ -15,6 +15,7 @@ import ChallengesPage from '../pages/ChallengesPage';
 import FutureSelfSimulatorPage from '../pages/FutureSelfSimulatorPage';
 import ProgressVisualizationPage from '../pages/ProgressVisualizationPage';
 import GamificationPage from '../pages/GamificationPage';
+import LifeThemePage from '../pages/LifeThemePage';
 
 const AppRouter: React.FC = () => (
   <Router>
@@ -30,7 +31,8 @@ const AppRouter: React.FC = () => (
       <Route path="/reflection" element={<ReflectionPage />} />
       <Route path="/reflection-prompts" element={<ReflectionPromptPage />} />
       <Route path="/challenges" element={<ChallengesPage />} />
-<Route path="/future-self" element={<FutureSelfSimulatorPage />} />
+      <Route path="/future-self" element={<FutureSelfSimulatorPage />} />
+      <Route path="/life-theme" element={<LifeThemePage />} />
       <Route path="*" element={<LoginPage />} />
     </Routes>
   </Router>

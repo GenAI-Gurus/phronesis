@@ -43,6 +43,15 @@ const DashboardPage: React.FC = () => {
   return (
     <Box maxWidth={800} mx="auto" mt={6}>
       <UserSummaryCard name={mockUser.name} email={mockUser.email} />
+      <Box mt={3} mb={3}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="h6">Life Theme</Typography>
+          <Button size="small" variant="outlined" onClick={() => navigate('/life-theme')}>View / Edit</Button>
+        </Box>
+        <Typography color="text.secondary" mt={1}>
+          Define your guiding principle to help align your decisions and track your journey.
+        </Typography>
+      </Box>
       <QuickActions />
       <RecentJournalsList journals={mockJournals} />
       <ProgressBadges badges={mockBadges} />

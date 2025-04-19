@@ -77,6 +77,14 @@ app.include_router(
     tags=["gamification"],
 )
 
+from app.api.v1.endpoints import life_theme
+
+app.include_router(
+    life_theme.router,
+    prefix="/api/v1",
+    tags=["life-theme"],
+)
+
 
 @app.get("/")
 def read_root():
