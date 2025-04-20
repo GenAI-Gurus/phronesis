@@ -17,10 +17,12 @@ import ProgressVisualizationPage from '../pages/ProgressVisualizationPage';
 import GamificationPage from '../pages/GamificationPage';
 import LifeThemePage from '../pages/LifeThemePage';
 import NotFoundPage from '../pages/NotFoundPage';
+import LandingPage from '../pages/LandingPage';
 
 const AppRouter: React.FC = () => (
   <Router>
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />

@@ -43,6 +43,10 @@ test.db
 backend/test.db
 .git_commit_msg_tmp
 
+# Playwright
+playwright-report/
+test-results/
+
 # Ignore secrets
 .env.local
 .env.production

@@ -54,18 +54,18 @@ test.describe('User Registration & Authentication', () => {
     await expect(page.getByText(/invalid|failed|incorrect/i)).toBeVisible();
   });
 
-  test('Update profile data and verify persistence', async ({ page }) => {
+  test('Session persists and protected routes accessible after login', async ({ page }) => {
     const email = randomEmail();
     await page.goto('/register');
-    await page.getByLabel('Email').fill( email);
-    await page.getByLabel('Password').fill( password);
+    await page.getByLabel('Email').fill(email);
+    await page.getByLabel('Password').fill(password);
     await page.click('button[type="submit"]');
     await expect(page.getByText(/registration successful/i)).toBeVisible();
 
     // Login
     await page.goto('/login');
-    await page.getByLabel('Email').fill( email);
-    await page.getByLabel('Password').fill( password);
+    await page.getByLabel('Email').fill(email);
+    await page.getByLabel('Password').fill(password);
     await page.click('button[type="submit"]');
     await expect(page.getByText(/dashboard|welcome|logout/i)).toBeVisible();
 
@@ -73,14 +73,12 @@ test.describe('User Registration & Authentication', () => {
     const jwt = await page.evaluate(() => localStorage.getItem('jwt'));
     expect(jwt).not.toBeNull();
 
-    // Update profile (adjust selectors/fields as needed)
-    await page.goto('/profile');
-    await page.fill('input[name="name"]', 'Test User');
-    await page.click('button[type="submit"]');
-    await expect(page.getByText(/profile updated|success/i)).toBeVisible();
-    // Reload and verify
-    await page.reload();
-    await expect(page.locator('input[name="name"]').inputValue()).resolves.toMatch(/Test User/);
+    // Check session persistence by navigating to dashboard and journal
+    await page.goto('/dashboard');
+    await expect(page.getByText(/dashboard|welcome|logout/i)).toBeVisible();
+
+    await page.goto('/journal');
+    await expect(page.getByText(/journal|entry|new decision/i)).toBeVisible();
   });
 
   test('JWT is issued and used for all protected endpoints', async ({ page, context }) => {

@@ -23,7 +23,7 @@ const EditJournalEntryPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const resp = await fetch(`/api/v1/decisions/journal/${id}`);
+        const resp = await fetch(`/api/decisions/journal/${id}`);
         if (!resp.ok) throw new Error((await resp.json()).detail || 'Failed to fetch entry');
         const data = await resp.json();
         setOriginal(data);
@@ -51,7 +51,7 @@ const EditJournalEntryPage: React.FC = () => {
     setError(null);
     setResult(null);
     try {
-      const resp = await fetch(`/api/v1/decisions/journal/${id}`, {
+      const resp = await fetch(`/api/decisions/journal/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

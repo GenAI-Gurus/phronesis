@@ -8,13 +8,13 @@ export interface ValueCalibrationCheckin {
 }
 
 export async function createValueCalibrationCheckin(values: Record<string, number>): Promise<ValueCalibrationCheckin> {
-  const resp = await axios.post('/api/v1/value-calibration/checkins', {
+  const resp = await axios.post('/api/value-calibration/checkins', {
     value_snapshot: JSON.stringify(values),
   }, { withCredentials: true });
   return resp.data;
 }
 
 export async function listValueCalibrationCheckins(): Promise<ValueCalibrationCheckin[]> {
-  const resp = await axios.get('/api/v1/value-calibration/checkins', { withCredentials: true });
+  const resp = await axios.get('/api/value-calibration/checkins', { withCredentials: true });
   return resp.data;
 }

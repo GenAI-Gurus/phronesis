@@ -7,7 +7,7 @@ export interface ValueCalibrationCheckin {
 
 export async function getValueCalibrationCheckins(): Promise<ValueCalibrationCheckin[]> {
   const response = await axios.get<ValueCalibrationCheckin[]>(
-    "/value-calibration/checkins"
+    "/api/value-calibration/checkins"
   );
   return response.data;
 }
@@ -18,7 +18,7 @@ export interface DecisionJournalEntry {
 
 export async function getDecisionJournalEntries(): Promise<DecisionJournalEntry[]> {
   const response = await axios.get<DecisionJournalEntry[]>(
-    "/decisions/journal"
+    "/api/decisions/journal"
   );
   return response.data;
 }

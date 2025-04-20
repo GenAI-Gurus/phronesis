@@ -27,7 +27,7 @@ const NewDecisionPage: React.FC = () => {
     setError(null);
     setResult(null);
     try {
-      const resp = await fetch('/api/v1/decisions/journal', {
+      const resp = await fetch('/api/decisions/journal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

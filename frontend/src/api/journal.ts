@@ -1,7 +1,7 @@
 // API client for Decision Journal endpoints
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export interface JournalEntry {
   id: string;

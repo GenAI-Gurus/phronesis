@@ -17,7 +17,7 @@ interface Message {
   content: string;
 }
 
-const API_URL = '/api/v1/decision-support/chat';
+const API_URL = '/api/decision-support/chat';
 
 const DecisionSupportChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);

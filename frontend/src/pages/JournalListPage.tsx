@@ -15,7 +15,7 @@ const JournalListPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const resp = await fetch('/api/v1/decisions/journal');
+        const resp = await fetch('/api/decisions/journal');
         if (!resp.ok) throw new Error((await resp.json()).detail || 'Failed to fetch journal entries');
         setEntries(await resp.json());
       } catch (err: any) {
