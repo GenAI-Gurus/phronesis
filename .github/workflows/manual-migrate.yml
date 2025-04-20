@@ -1,0 +1,28 @@
+name: Manual DB Migration
+
+on:
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    env:
+      AZURE_WEBAPP_NAME: phronesis-backend-app
+      AZURE_RESOURCE_GROUP: phronesis-rg
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Run Alembic migrations in App Service container
+        run: |
+          set -e
+          echo "Running Alembic migrations in deployed container..."
+          MIGRATION_OUTPUT=$(az webapp ssh --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --command 'cd /app && poetry run alembic upgrade head' 2>&1) || {
+            echo "Alembic migration failed! Output was:"
+            echo "$MIGRATION_OUTPUT"
+            exit 1
+          }
+          echo "$MIGRATION_OUTPUT"

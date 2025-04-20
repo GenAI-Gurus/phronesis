@@ -124,17 +124,6 @@ jobs:
             --docker-registry-server-user ${{ github.actor }} \
             --docker-registry-server-password ${{ secrets.GITHUB_TOKEN }}
 
-      # --- Automated Alembic Migration (Experimental, see progress.md for safety improvements) ---
-      - name: Run Alembic migrations in App Service container
-        run: |
-          set -e
-          echo "Running Alembic migrations in deployed container..."
-          MIGRATION_OUTPUT=$(az webapp ssh --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --command 'cd /app && poetry run alembic upgrade head' 2>&1) || {
-            echo "Alembic migration failed! Output was:"
-            echo "$MIGRATION_OUTPUT"
-            exit 1
-          }
-          echo "$MIGRATION_OUTPUT"
 
 # Instructions:
 # 1. Set your Azure Web App name above.

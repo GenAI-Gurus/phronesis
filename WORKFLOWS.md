@@ -14,8 +14,9 @@ Workflows are defined in `.github/workflows/`. They automate CI, deployment, lin
 
 | Workflow File                      | Purpose                                 | Triggers/Conditions                 |
 |------------------------------------|-----------------------------------------|--------------------------|
-| `azure-backend.yml`                | Backend CI, test, lint, deploy to Azure | Push/PR to backend files (skips deploy if only `backend/tests/` changes) |
+| `azure-backend.yml`                | Backend CI, test, lint, deploy to Azure (no longer runs DB migrations automatically) | Push/PR to backend files (skips deploy if only `backend/tests/` changes) |
 | `azure-static-web-apps.yml`        | Frontend build & deploy to Azure Static Web Apps | Push/PR to frontend files (skips deploy if only `frontend/tests/` changes) |
+| `manual-migrate.yml`               | Run Alembic DB migrations in production or staging manually | Manual trigger from GitHub Actions UI |
 | `ci.yml`                           | General CI (tests, lint, etc.)          | Push/PR (all branches)   |
 
 ---
@@ -28,6 +29,7 @@ Workflows are defined in `.github/workflows/`. They automate CI, deployment, lin
   - Runs linting (Black)
   - Runs all Pytest tests
   - Deploys backend (Docker) to Azure App Service (only if non-test backend files changed)
+  - **Note:** Database migrations are now run via the manual workflow (see below), not automatically after deploy.
 - **Trigger/Condition:**
   - Push or PR to any file under `backend/` or the workflow itself
   - **Deployment is skipped if only `backend/tests/` files were changed** (tests still run)
@@ -60,6 +62,22 @@ Workflows are defined in `.github/workflows/`. They automate CI, deployment, lin
 - **Note:**
   - Full E2E tests are not run on every push for speed/cost reasons.
   - For fast post-deploy health checks, consider adding a smoke test step to deploy workflows (e.g., azure-static-web-apps.yml).
+
+### 4. `manual-migrate.yml`
+- **Purpose:**
+  - Run Alembic DB migrations in the deployed backend container (production or staging) via a manual trigger.
+  - Ensures migrations are only run after verifying the new container is healthy and deployed.
+- **Trigger:**
+  - Manual trigger from the GitHub Actions UI (`workflow_dispatch`).
+- **Usage:**
+  1. Deploy backend using `azure-backend.yml` (wait for success).
+  2. Go to GitHub Actions, select the "Manual DB Migration" workflow, and click "Run workflow".
+  3. The workflow will SSH into the Azure App Service container and run `alembic upgrade head`.
+  4. If the migration fails, the workflow fails and outputs the error.
+- **Best Practices:**
+  - Consider running a backup before migration.
+  - Use for both staging and production as needed.
+  - For critical migrations, consider a manual approval step or backup.
 
 ---
 
