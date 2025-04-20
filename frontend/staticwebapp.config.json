@@ -1,12 +1,6 @@
 {
-  "routes": [
-    {
-      "route": "/api/*",
-      "rewrite": "https://phronesis-backend-app.azurewebsites.net/api/v1/:*"
-    }
-  ],
   "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/api/*"]
+    "rewrite": "/index.html"
   }
 }
+
