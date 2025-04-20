@@ -5,12 +5,22 @@ import { useParams, useNavigate } from 'react-router-dom';
 /**
  * Shows full details of a Decision Journal Entry, including AI-generated tags.
  */
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const JournalDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [entry, setEntry] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (!jwt) {
+      navigate('/login');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     (async () => {
@@ -26,9 +36,18 @@ const JournalDetailPage: React.FC = () => {
     })();
   }, [id]);
 
+  const jwt = localStorage.getItem('jwt');
+  if (!jwt) {
+    return (
+      <Box mt={8} textAlign="center">
+        <Alert severity="warning">You must be logged in to view this journal entry.</Alert>
+        <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate('/login')}>Go to Login</Button>
+      </Box>
+    );
+  }
   if (loading) return <Box mt={8} textAlign="center"><CircularProgress /></Box>;
   if (error) return <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>;
-  if (!entry) return null;
+  if (!entry) return <Typography mt={8} textAlign="center">Entry not found.</Typography>;
 
   return (
     <Box maxWidth={700} mx="auto" mt={6}>

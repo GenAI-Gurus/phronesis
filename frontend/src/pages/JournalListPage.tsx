@@ -26,6 +26,13 @@ const JournalListPage: React.FC = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (!jwt) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
   const jwt = localStorage.getItem('jwt');
   if (!jwt) {
     return (

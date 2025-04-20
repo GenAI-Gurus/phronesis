@@ -5,6 +5,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 /**
  * Edit form for Decision Journal Entry. On submit, updates entry and displays updated tags.
  */
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const EditJournalEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [form, setForm] = useState({
@@ -19,6 +22,13 @@ const EditJournalEntryPage: React.FC = () => {
   const [result, setResult] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (!jwt) {
+      navigate('/login');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     (async () => {
@@ -71,6 +81,15 @@ const EditJournalEntryPage: React.FC = () => {
     }
   };
 
+  const jwt = localStorage.getItem('jwt');
+  if (!jwt) {
+    return (
+      <Box mt={8} textAlign="center">
+        <Alert severity="warning">You must be logged in to edit this journal entry.</Alert>
+        <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate('/login')}>Go to Login</Button>
+      </Box>
+    );
+  }
   if (loading) return <Box mt={8} textAlign="center"><CircularProgress /></Box>;
   if (error) return <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>;
   if (!original) return null;

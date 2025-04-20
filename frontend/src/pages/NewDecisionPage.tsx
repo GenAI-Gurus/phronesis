@@ -7,6 +7,9 @@ import { Box, Typography, Paper, TextField, Button, Chip, Stack, Alert } from '@
  * Decision Journal Entry creation form with AI-generated auto-tag display.
  * Submits to backend and displays tags (domain, sentiment, keywords) after creation.
  */
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const NewDecisionPage: React.FC = () => {
   const [form, setForm] = useState({
     title: '',
@@ -17,6 +20,15 @@ const NewDecisionPage: React.FC = () => {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (!jwt) {
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -39,6 +51,16 @@ const NewDecisionPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const jwt = localStorage.getItem('jwt');
+  if (!jwt) {
+    return (
+      <Box mt={8} textAlign="center">
+        <Alert severity="warning">You must be logged in to create a journal entry.</Alert>
+        <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate('/login')}>Go to Login</Button>
+      </Box>
+    );
+  }
 
   return (
     <Box maxWidth={600} mx="auto" mt={6}>
