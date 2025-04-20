@@ -1,5 +1,6 @@
 // src/pages/NewDecisionPage.tsx
 import React, { useState } from 'react';
+import api from '../api/client';
 import { Box, Typography, Paper, TextField, Button, Chip, Stack, Alert } from '@mui/material';
 
 /**
@@ -27,17 +28,11 @@ const NewDecisionPage: React.FC = () => {
     setError(null);
     setResult(null);
     try {
-      const resp = await fetch('/api/decisions/journal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          values: form.values.split(',').map(v => v.trim()).filter(Boolean),
-        }),
+      const resp = await api.post('/decisions/journal', {
+        ...form,
+        values: form.values.split(',').map(v => v.trim()).filter(Boolean),
       });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.detail || 'Unknown error');
-      setResult(data);
+      setResult(resp.data);
     } catch (err: any) {
       setError(err.message);
     } finally {
