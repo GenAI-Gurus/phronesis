@@ -15,12 +15,27 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const jwt = localStorage.getItem('jwt');
 
-  // TODO: Replace with real API calls
-  const mockUser = { name: 'Alex Example', email: 'alex@example.com' };
-  const mockJournals: JournalEntry[] = [
-    { id: '1', title: 'Should I switch jobs?', created_at: '2025-04-13T10:00:00Z' },
-    { id: '2', title: 'Buying a new car decision', created_at: '2025-04-10T15:30:00Z' }
-  ];
+  const [journals, setJournals] = React.useState<JournalEntry[]>([]);
+  const [journalsError, setJournalsError] = React.useState<string | null>(null);
+  const [loadingJournals, setLoadingJournals] = React.useState(true);
+
+  React.useEffect(() => {
+    setLoadingJournals(true);
+    setJournalsError(null);
+    fetch('/api/decisions/journal', {
+      headers: { 'Authorization': `Bearer ${jwt}` }
+    })
+      .then(async (resp) => {
+        if (!resp.ok) throw new Error((await resp.json()).detail || 'Failed to fetch journal entries');
+        return resp.json();
+      })
+      .then(setJournals)
+      .catch((err) => setJournalsError(err.message))
+      .finally(() => setLoadingJournals(false));
+  }, [jwt]);
+
+  // TODO: Replace with real user info and badges from backend
+  const mockUser = { name: 'User', email: '' };
   const mockBadges: Badge[] = [
     { id: 'b1', name: 'Reflector', description: 'Completed first reflection' },
     { id: 'b2', name: 'Streak Starter', description: 'Logged decisions 3 days in a row' }
@@ -53,7 +68,13 @@ const DashboardPage: React.FC = () => {
         </Typography>
       </Box>
       <QuickActions />
-      <RecentJournalsList journals={mockJournals} />
+      {loadingJournals ? (
+        <Typography color="text.secondary">Loading journals...</Typography>
+      ) : journalsError ? (
+        <Typography color="error">{journalsError}</Typography>
+      ) : (
+        <RecentJournalsList journals={journals} />
+      )}
       <ProgressBadges badges={mockBadges} />
       <Box mt={2} textAlign="center">
         <Button variant="outlined" color="secondary" onClick={handleLogout}>Logout</Button>
