@@ -4,13 +4,35 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/azure-static-web-apps.yml'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/azure-static-web-apps.yml'
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_non_test: ${{ steps.filter.outputs.frontend_non_test }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend_non_test:
+              - 'frontend/**'
+              - '!frontend/tests/**'
+
   build_and_deploy:
+    needs: changes
+    if: needs.changes.outputs.frontend_non_test == 'true'
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:

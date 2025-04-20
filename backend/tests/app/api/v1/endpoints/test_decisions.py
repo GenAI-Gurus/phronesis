@@ -351,19 +351,90 @@ def test_update_journal_entry_triggers_retag(user_and_auth_header, client):
 
 def test_list_journal_entries_expected(user_and_auth_header, client):
     """Expected: List all journal entries for the authenticated user."""
-    _, auth_header = user_and_auth_header
+    user_id, auth_header = user_and_auth_header
     # Create two entries
-    payload1 = {"title": "Entry 1"}
-    payload2 = {"title": "Entry 2", "domain": "health"}
-    client.post("/api/v1/decisions/journal", json=payload1, headers=auth_header)
-    client.post("/api/v1/decisions/journal", json=payload2, headers=auth_header)
-    response = client.get("/api/v1/decisions/journal", headers=auth_header)
-    assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
+    payload1 = {
+        "title": "First entry",
+        "context": "Work situation.",
+        "anticipated_outcomes": "Promotion",
+        "values": ["integrity", "growth"],
+    }
+    payload2 = {
+        "title": "Second entry",
+        "context": "Health decision.",
+        "anticipated_outcomes": "Better fitness",
+        "values": ["health", "discipline"],
+    }
+    resp1 = client.post("/api/v1/decisions/journal", json=payload1, headers=auth_header)
+    resp2 = client.post("/api/v1/decisions/journal", json=payload2, headers=auth_header)
+    assert resp1.status_code == 201
+    assert resp2.status_code == 201
+    list_resp = client.get("/api/v1/decisions/journal", headers=auth_header)
+    assert list_resp.status_code == 200
+    data = list_resp.json()
     assert len(data) >= 2
-    titles = [entry["title"] for entry in data]
-    assert "Entry 1" in titles and "Entry 2" in titles
+    titles = [e["title"] for e in data]
+    assert "First entry" in titles and "Second entry" in titles
+
+
+def test_get_journal_entry_expected(user_and_auth_header, client):
+    """Expected: Retrieve a single journal entry by ID."""
+    user_id, auth_header = user_and_auth_header
+    payload = {
+        "title": "Single Entry",
+        "context": "For GET test",
+        "anticipated_outcomes": "Success",
+        "values": ["clarity"],
+    }
+    create_resp = client.post(
+        "/api/v1/decisions/journal", json=payload, headers=auth_header
+    )
+    assert create_resp.status_code == 201
+    entry_id = create_resp.json()["id"]
+    get_resp = client.get(f"/api/v1/decisions/journal/{entry_id}", headers=auth_header)
+    assert get_resp.status_code == 200
+    data = get_resp.json()
+    assert data["id"] == entry_id
+    assert data["title"] == "Single Entry"
+    assert data["context"] == "For GET test"
+
+
+def test_get_journal_entry_not_found(user_and_auth_header, client):
+    """Failure: Retrieve a non-existent journal entry."""
+    _, auth_header = user_and_auth_header
+    fake_id = "00000000-0000-0000-0000-000000000000"
+    resp = client.get(f"/api/v1/decisions/journal/{fake_id}", headers=auth_header)
+    assert resp.status_code == 404
+
+
+def test_get_journal_entry_invalid_id(user_and_auth_header, client):
+    """Failure: Retrieve a journal entry with invalid UUID format."""
+    _, auth_header = user_and_auth_header
+    resp = client.get("/api/v1/decisions/journal/not-a-uuid", headers=auth_header)
+    assert resp.status_code == 422
+
+
+def test_get_journal_entry_unauthenticated(client):
+    """Failure: Retrieve a journal entry without authentication."""
+    # Create a user and entry first
+    test_client = TestClient(app)
+    user_id, token = create_and_authenticate_user(test_client)
+    payload = {
+        "title": "Private Entry",
+        "context": "Should not be accessible",
+        "anticipated_outcomes": "None",
+        "values": ["privacy"],
+    }
+    create_resp = test_client.post(
+        "/api/v1/decisions/journal",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert create_resp.status_code == 201
+    entry_id = create_resp.json()["id"]
+    # Try to get without auth
+    resp = client.get(f"/api/v1/decisions/journal/{entry_id}")
+    assert resp.status_code == 401
 
 
 def test_list_journal_entries_failure_unauthenticated(client):

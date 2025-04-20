@@ -12,10 +12,10 @@ Workflows are defined in `.github/workflows/`. They automate CI, deployment, lin
 
 ## Workflow Summary
 
-| Workflow File                      | Purpose                                 | Triggers                 |
+| Workflow File                      | Purpose                                 | Triggers/Conditions                 |
 |------------------------------------|-----------------------------------------|--------------------------|
-| `azure-backend.yml`                | Backend CI, test, lint, deploy to Azure | Push/PR to backend branch|
-| `azure-static-web-apps.yml`        | Frontend build & deploy to Azure Static Web Apps | Push/PR to `main` |
+| `azure-backend.yml`                | Backend CI, test, lint, deploy to Azure | Push/PR to backend files (skips deploy if only `backend/tests/` changes) |
+| `azure-static-web-apps.yml`        | Frontend build & deploy to Azure Static Web Apps | Push/PR to frontend files (skips deploy if only `frontend/tests/` changes) |
 | `ci.yml`                           | General CI (tests, lint, etc.)          | Push/PR (all branches)   |
 
 ---
@@ -27,15 +27,21 @@ Workflows are defined in `.github/workflows/`. They automate CI, deployment, lin
   - Installs backend dependencies
   - Runs linting (Black)
   - Runs all Pytest tests
-  - Deploys backend (Docker) to Azure App Service
-- **Trigger:** Push or PR to backend-related branches
+  - Deploys backend (Docker) to Azure App Service (only if non-test backend files changed)
+- **Trigger/Condition:**
+  - Push or PR to any file under `backend/` or the workflow itself
+  - **Deployment is skipped if only `backend/tests/` files were changed** (tests still run)
+  - Uses `dorny/paths-filter` for detection
 
 ### 2. `azure-static-web-apps.yml`
 - **Purpose:**
   - Installs frontend dependencies
   - Builds React/Vite frontend
-  - Deploys to Azure Static Web Apps
-- **Trigger:** Push or PR to `main` branch
+  - Deploys to Azure Static Web Apps (only if non-test frontend files changed)
+- **Trigger/Condition:**
+  - Push or PR to any file under `frontend/` or the workflow itself
+  - **Deployment is skipped if only `frontend/tests/` files were changed** (tests/builds still run)
+  - Uses `dorny/paths-filter` for detection
 - **Secrets:** Requires `AZURE_STATIC_WEB_APPS_API_TOKEN` in repo secrets
 - **Important:** For Vite/React builds in GitHub Actions, all environment variables (e.g., `VITE_API_URL`) **must be set as GitHub secrets** and passed via the `env:` block in the workflow. Azure portal environment variables will NOT be available during GitHub Actions builds.
 ### 3. `ci.yml`

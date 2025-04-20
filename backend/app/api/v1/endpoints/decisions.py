@@ -331,6 +331,31 @@ def list_decision_journal_entries(
     )
 
 
+@router.get("/journal/{entry_id}", response_model=DecisionJournalEntryOut)
+def get_decision_journal_entry(
+    entry_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Retrieve a single decision journal entry by ID for the authenticated user.
+    """
+    import uuid
+
+    try:
+        entry_uuid = uuid.UUID(entry_id)
+    except (ValueError, AttributeError):
+        raise HTTPException(status_code=422, detail="Invalid entry_id format")
+    entry = (
+        db.query(DecisionJournalEntry)
+        .filter_by(id=str(entry_uuid), user_id=str(current_user.id))
+        .first()
+    )
+    if not entry:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    return entry
+
+
 @router.patch("/journal/{entry_id}", response_model=DecisionJournalEntryOut)
 def update_decision_journal_entry(
     entry_id: str,

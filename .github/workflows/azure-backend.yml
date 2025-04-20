@@ -17,10 +17,34 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/azure-backend.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/azure-backend.yml'
   workflow_dispatch:
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend_non_test: ${{ steps.filter.outputs.backend_non_test }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend_non_test:
+              - 'backend/**'
+              - '!backend/tests/**'
+
   test:
+    needs: changes
     defaults:
       run:
         working-directory: backend
@@ -50,7 +74,8 @@ jobs:
         run: PYTHONPATH=. poetry run pytest --maxfail=1 --disable-warnings --tb=short -s
 
   build-and-deploy:
-    needs: test
+    needs: [test, changes]
+    if: needs.changes.outputs.backend_non_test == 'true'
     runs-on: ubuntu-latest
     env:
       AZURE_WEBAPP_NAME: phronesis-backend-app
