@@ -206,3 +206,12 @@
 [x] 63. Set Up CI/CD Pipeline
     - GitHub Actions is now configured for backend (FastAPI, Poetry) and frontend (React, Vite) CI. See .github/workflows/ci-cd.yml and README.md for details.
 [ ] 64. Deploy MVP to Production
+
+---
+
+## Discovered During Work
+
+[ ] Improve safety and robustness of automated DB migrations
+    - Add pre-migration backup, manual approval for production, and/or rollback strategy.
+    - Review Azure App Service + Alembic best practices for zero-downtime and safe schema changes.
+    - See .github/workflows/azure-backend.yml and specification.md for current implementation and context.
