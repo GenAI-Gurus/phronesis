@@ -66,14 +66,16 @@ Workflows are defined in `.github/workflows/`. They automate CI, deployment, lin
 ### 4. `manual-migrate.yml`
 - **Purpose:**
   - Run Alembic DB migrations in the deployed backend container (production or staging) via a manual trigger.
+  - Uses the Azure App Service Kudu API to execute the migration command inside the running container.
   - Ensures migrations are only run after verifying the new container is healthy and deployed.
 - **Trigger:**
   - Manual trigger from the GitHub Actions UI (`workflow_dispatch`).
 - **Usage:**
   1. Deploy backend using `azure-backend.yml` (wait for success).
-  2. Go to GitHub Actions, select the "Manual DB Migration" workflow, and click "Run workflow".
-  3. The workflow will SSH into the Azure App Service container and run `alembic upgrade head`.
-  4. If the migration fails, the workflow fails and outputs the error.
+  2. In Azure Portal, go to your App Service > Deployment Center > FTPS credentials. Copy your Kudu deployment username and password.
+  3. Add these as GitHub secrets: `AZURE_KUDU_USER` and `AZURE_KUDU_PASS`.
+  4. Go to GitHub Actions, select the "Manual DB Migration" workflow, and click "Run workflow".
+  5. The workflow will use the Kudu API to run `alembic upgrade head` in your container. Output and errors are visible in the Actions log.
 - **Best Practices:**
   - Consider running a backup before migration.
   - Use for both staging and production as needed.

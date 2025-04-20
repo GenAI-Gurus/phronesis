@@ -7,22 +7,25 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     env:
-      AZURE_WEBAPP_NAME: phronesis-backend-app
-      AZURE_RESOURCE_GROUP: phronesis-rg
+      KUDU_USER: ${{ secrets.AZURE_KUDU_USER }}
+      KUDU_PASS: ${{ secrets.AZURE_KUDU_PASS }}
+      KUDU_SITE: "https://phronesis-backend-app.scm.azurewebsites.net"
 
     steps:
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Run Alembic migrations in App Service container
+      - name: Run Alembic migrations via Kudu API
         run: |
           set -e
-          echo "Running Alembic migrations in deployed container..."
-          MIGRATION_OUTPUT=$(az webapp ssh --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --command 'cd /app && poetry run alembic upgrade head' 2>&1) || {
-            echo "Alembic migration failed! Output was:"
-            echo "$MIGRATION_OUTPUT"
+          echo "Running Alembic migrations via Kudu API..."
+          RESPONSE=$(curl -s -u "$KUDU_USER:$KUDU_PASS" -X POST "$KUDU_SITE/api/command" \
+            -H "Content-Type: application/json" \
+            -d '{"command": "cd /home/site/wwwroot && poetry run alembic upgrade head"}')
+          echo "$RESPONSE"
+          # Optionally fail if the response contains an error
+          if echo "$RESPONSE" | grep -i error; then
+            echo "Migration failed!"
             exit 1
-          }
-          echo "$MIGRATION_OUTPUT"
+          fi
+# Required secrets:
+#   - AZURE_KUDU_USER: Kudu deployment username (from Azure Portal > Deployment Center > FTPS credentials)
+#   - AZURE_KUDU_PASS: Kudu deployment password
+# See WORKFLOWS.md for usage instructions.
