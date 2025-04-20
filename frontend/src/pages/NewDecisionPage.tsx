@@ -40,7 +40,7 @@ const NewDecisionPage: React.FC = () => {
     setError(null);
     setResult(null);
     try {
-      const resp = await api.post('/decisions/journal', {
+      const resp = await api.post(`${import.meta.env.VITE_API_URL}/decisions/journal`, {
         ...form,
         values: form.values.split(',').map(v => v.trim()).filter(Boolean),
       });

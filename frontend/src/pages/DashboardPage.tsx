@@ -22,17 +22,13 @@ const DashboardPage: React.FC = () => {
   React.useEffect(() => {
     setLoadingJournals(true);
     setJournalsError(null);
-    fetch('/api/decisions/journal', {
-      headers: { 'Authorization': `Bearer ${jwt}` }
-    })
-      .then(async (resp) => {
-        if (!resp.ok) throw new Error((await resp.json()).detail || 'Failed to fetch journal entries');
-        return resp.json();
-      })
-      .then(setJournals)
-      .catch((err) => setJournalsError(err.message))
-      .finally(() => setLoadingJournals(false));
-  }, [jwt]);
+    import('../api/client').then(({ default: api }) => {
+      api.get('/decisions/journal')
+        .then((resp) => setJournals(resp.data))
+        .catch((err) => setJournalsError(err?.response?.data?.detail || err.message))
+        .finally(() => setLoadingJournals(false));
+    });
+  }, []);
 
   // TODO: Replace with real user info and badges from backend
   const mockUser = { name: 'User', email: '' };

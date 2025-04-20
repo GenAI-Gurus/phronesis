@@ -25,7 +25,8 @@ const JournalDetailPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const resp = await fetch(`/api/decisions/journal/${id}`);
+        const api = (await import('../api/client')).default;
+const resp = await api.get(`/decisions/journal/${id}`);
         if (!resp.ok) throw new Error((await resp.json()).detail || 'Failed to fetch entry');
         setEntry(await resp.json());
       } catch (err: any) {

@@ -95,7 +95,7 @@ def generate_reflection_prompts(
                 {"role": "user", "content": user_content},
             ]
             response = client.chat.completions.create(
-                model=OPENAI_MODEL,
+                model="gpt-4.1-nano",
                 messages=messages,
                 max_tokens=256,
                 n=1,

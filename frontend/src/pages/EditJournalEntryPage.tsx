@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, TextField, Button, Stack, CircularProgress, Alert } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -61,7 +62,8 @@ const EditJournalEntryPage: React.FC = () => {
     setError(null);
     setResult(null);
     try {
-      const resp = await fetch(`/api/decisions/journal/${id}`, {
+      const api = (await import('../api/client')).default;
+const resp = await api.patch(`/decisions/journal/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
