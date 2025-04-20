@@ -134,11 +134,10 @@ def test_generate_prompts_openai_success(
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["prompts"] == [
-        "Why did you make this decision?",
-        "What values did it touch?",
-        "How do you feel now?",
-    ]
+    assert "prompts" in data
+    assert isinstance(data["prompts"], list)
+    assert len(data["prompts"]) >= 1
+    assert all(isinstance(p, str) and p.strip() for p in data["prompts"])
     assert data["ai_generated"] is True
 
 

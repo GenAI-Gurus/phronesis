@@ -48,7 +48,8 @@ def decision_support_chat(
     try:
         if openai is not None and api_key:
             openai.api_key = api_key
-            response = openai.ChatCompletion.create(
+            client = openai.OpenAI(api_key=api_key)
+            response = client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=[{"role": m.role, "content": m.content} for m in req.messages],
                 max_tokens=512,

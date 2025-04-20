@@ -15,14 +15,31 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-nano")
 
 AUTO_TAG_FUNCTION = {
     "name": "auto_tag_journal_entry",
-    "description": "Auto-tag a decision journal entry with domains, sentiment, and keywords.",
+    "description": (
+        "Auto-tag a decision journal entry with domains, sentiment, and keywords. "
+        "Only use the provided values for each field. For keywords, choose only from: "
+        "promotion, boss, colleague, salary, job, deadline, project, meeting, health, exercise, diet, stress, sleep, habit, learning, reading, family, friend, partner, conflict, support, communication, savings, debt, investment, expense, budget, purchase, courage, honesty, integrity, gratitude, fear, happiness, regret, motivation."
+    ),
     "parameters": {
         "type": "object",
         "properties": {
             "domain_tags": {
                 "type": "array",
-                "items": {"type": "string"},
-                "description": "Relevant domains (e.g., career, health, relationships, finance, personal_growth)",
+                "items": {
+                    "type": "string",
+                    "enum": [
+                        "career",
+                        "health",
+                        "relationships",
+                        "finance",
+                        "personal_growth",
+                        "ambiguous",
+                    ],
+                },
+                "description": (
+                    "Relevant domains (choose from: career, health, relationships, finance, personal_growth, ambiguous). "
+                    "Always return at least one domain tag; if no other tag is appropriate, use 'ambiguous'."
+                ),
             },
             "sentiment_tag": {
                 "type": "string",
@@ -31,8 +48,53 @@ AUTO_TAG_FUNCTION = {
             },
             "keywords": {
                 "type": "array",
-                "items": {"type": "string"},
-                "description": "Key topics or concepts from the entry",
+                "items": {
+                    "type": "string",
+                    "enum": [
+                        "promotion",
+                        "boss",
+                        "colleague",
+                        "salary",
+                        "job",
+                        "deadline",
+                        "project",
+                        "meeting",
+                        "health",
+                        "exercise",
+                        "diet",
+                        "stress",
+                        "sleep",
+                        "habit",
+                        "learning",
+                        "reading",
+                        "family",
+                        "friend",
+                        "partner",
+                        "conflict",
+                        "support",
+                        "communication",
+                        "savings",
+                        "debt",
+                        "investment",
+                        "expense",
+                        "budget",
+                        "purchase",
+                        "courage",
+                        "honesty",
+                        "integrity",
+                        "gratitude",
+                        "fear",
+                        "happiness",
+                        "regret",
+                        "motivation",
+                        "ambiguous",
+                    ],
+                },
+                "description": (
+                    "Key topics or concepts from the entry. Only use these atomic tags: "
+                    "promotion, boss, colleague, salary, job, deadline, project, meeting, health, exercise, diet, stress, sleep, habit, learning, reading, family, friend, partner, conflict, support, communication, savings, debt, investment, expense, budget, purchase, courage, honesty, integrity, gratitude, fear, happiness, regret, motivation, ambiguous. "
+                    "Always return at least one keyword; if no other tag is appropriate, use 'ambiguous'."
+                ),
             },
         },
         "required": ["domain_tags", "sentiment_tag", "keywords"],
@@ -77,14 +139,14 @@ class OpenAITagger:
             },
         ]
         try:
-            response = openai.ChatCompletion.create(
+            client = openai.OpenAI(api_key=OPENAI_API_KEY)
+            response = client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=messages,
                 functions=[AUTO_TAG_FUNCTION],
                 function_call={"name": "auto_tag_journal_entry"},
-                api_key=OPENAI_API_KEY,
             )
-            args = response["choices"][0]["message"]["function_call"]["arguments"]
+            args = response.choices[0].message.function_call.arguments
             import json
 
             tags = json.loads(args)
