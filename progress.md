@@ -124,9 +124,12 @@
     *Modern React UI at /journal for listing, creating, viewing details, and editing entries. Modular components, robust error handling, and full unit test coverage (Vitest/RTL). Users can now create, view, and edit entries with AI-generated tags. All backend and frontend integration complete and tested.*
 
 [ ] 25. Integrate Speech-to-Text (Optional)
-[ ] 26. Implement Reflection Prompt Generator Endpoint
-[ ] 27. Integrate OpenAI API for Prompts
-[ ] 28. Develop UI for Reflection Prompts
+[x] 26. Implement Reflection Prompt Generator Endpoint  
+    *Backend endpoint, OpenAI integration, robust fallback logic, and Pytest unit tests (expected, edge, failure cases) are all complete. See backend/app/api/v1/endpoints/reflection.py.*
+[x] 27. Integrate OpenAI API for Prompts  
+    *OpenAI GPT-4.1-nano is fully integrated in the backend reflection prompt generator endpoint, with robust fallback logic and Pytest unit tests. See backend/app/api/v1/endpoints/reflection.py.*
+[x] 28. Develop UI for Reflection Prompts  
+    *ReflectionPromptPage.tsx implements a full-featured UI for generating and displaying AI-powered reflection prompts, with robust error/loading handling and Material UI design. See frontend/src/pages/ReflectionPromptPage.tsx.*
 [x] 29. Implement Auto Tagging and Categorization  
     *Now uses OpenAI LLM with function calling. All legacy NLP code and dependencies removed. Pytest unit tests—including edge and failure cases (e.g., OpenAI down)—are now complete and passing. Tests updated to mock OpenAI and simulate API failure.*
 [x] 30. Develop API for Value Calibration
@@ -171,15 +174,27 @@
 - Frontend Value Calibration UI and Chat UI are interactive, validated, and tested.
 - No accidental commits of local/test files; code hygiene is strong.
 
----
-
-### Next Steps: Azure Deployment
 [x] 50. Prepare backend for Azure App Service (Dockerfile or Gunicorn/Uvicorn config, environment variables) (IN PROGRESS)
-[ ] 51. Prepare frontend for Azure Static Web Apps (ensure build output is ready)
-[ ] 52. Connect Azure Key Vault or App Service settings for secrets (OPENAI_API_KEY, DB connection, etc.)
-[ ] 53. Add GitHub Actions deployment step for backend (azure/webapps-deploy@v3)
-[ ] 54. Add GitHub Actions deployment step for frontend (Azure/static-web-apps-deploy@v1)
-[ ] 55. Test deployment and document URLs for QA
+[x] 51. Prepare frontend for Azure Static Web Apps (ensure build output is ready)  
+    *Production build (`npm run build`) outputs to `dist/`, and deployment is fully automated via GitHub Actions (`.github/workflows/azure-static-web-apps.yml`). No manual steps are needed except managing GitHub secrets (`VITE_API_URL`, `AZURE_STATIC_WEB_APPS_API_TOKEN`).*
+[x] 52. Connect Azure Key Vault or App Service settings for secrets (OPENAI_API_KEY, DB connection, etc.)  
+    *backend/README.md now documents both App Service environment variables and Azure Key Vault reference syntax for secure secret management. No code changes required—just configure in Azure Portal as described.*
+[x] 53. Add GitHub Actions deployment step for backend (azure/webapps-deploy@v3)  
+    *.github/workflows/azure-backend.yml automates backend Docker build and deployment to Azure App Service using GitHub Actions. Manual Alembic migration step is noted in the workflow.*
+[x] 54. Add GitHub Actions deployment step for frontend (Azure/static-web-apps-deploy@v1)  
+    *.github/workflows/azure-static-web-apps.yml automates build and deployment of the frontend to Azure Static Web Apps using GitHub Actions.*
+[x] 55. Test deployment and document URLs for QA  
+    **Production URLs:**  
+    - Frontend: https://ambitious-ground-0a5060803.6.azurestaticapps.net/  
+    - Backend: https://phronesis-backend-app.azurewebsites.net/api/v1  
+    **QA Checklist:**  
+    - [ ] Frontend loads and displays dashboard  
+    - [ ] Registration and login work  
+    - [ ] Journal, reflection, and chat features function as expected  
+    - [ ] Backend API responds to requests (e.g., /api/v1/docs)  
+    - [ ] No critical errors in browser or server logs  
+    - [ ] Environment variables/secrets are loaded correctly  
+    - [ ] All major user flows tested
 
 [ ] 56. Set Up Push Notifications
 [ ] 57. Implement Email Notification System

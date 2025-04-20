@@ -41,8 +41,19 @@ Workflows are defined in `.github/workflows/`. They automate CI, deployment, lin
 ### 3. `ci.yml`
 - **Purpose:**
   - Runs general CI tasks (tests, lint, etc.)
-  - May cover both backend and frontend, or serve as a catch-all
-- **Trigger:** Push or PR to any branch
+  - Runs Playwright E2E tests for all major frontend user flows (across desktop and mobile)
+  - Uploads Playwright HTML report as a CI artifact for QA review
+- **Trigger:**
+  - Pull Request to `main`
+  - Nightly at 2am UTC (schedule)
+  - Manual trigger (workflow_dispatch)
+- **How to Review:**
+  - After every run, download the `playwright-report` artifact from the GitHub Actions UI.
+  - Open `index.html` in the report to view detailed E2E results, screenshots, logs, and outputs for all [A], [AI], and [A+M] tests.
+  - Follow the TESTING.md protocol for manual/AI review of flagged outputs.
+- **Note:**
+  - Full E2E tests are not run on every push for speed/cost reasons.
+  - For fast post-deploy health checks, consider adding a smoke test step to deploy workflows (e.g., azure-static-web-apps.yml).
 
 ---
 

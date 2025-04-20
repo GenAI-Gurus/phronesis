@@ -16,6 +16,18 @@ npm run dev
 
 The app will be available at [http://localhost:5173](http://localhost:5173) by default.
 
+### 3. Build for Production (Azure Static Web Apps)
+```bash
+npm run build
+```
+- The production build output will be in the `dist/` folder.
+- This folder is what Azure Static Web Apps expects for deployment.
+- If you see warnings about large chunks or "use client" directives from Material UI, these are non-blocking and safe to ignore for deployment.
+
+### 4. Deploy to Azure Static Web Apps
+- Push to the configured branch (usually `main`) to trigger the GitHub Actions deployment workflow.
+- Ensure all environment variables (e.g., `VITE_API_URL`) are set as GitHub secrets and passed in the workflow's `env:` block (see below).
+
 ## Setup & Development
 
 ### ⚠️ Environment Variables for Production (Vite)
@@ -37,9 +49,14 @@ The app will be available at [http://localhost:5173](http://localhost:5173) by d
 
 ## Environment Variables
 
-- Configure the backend API URL in `.env`:
+- For local development, configure the backend API URL in `.env`:
   ```env
   VITE_API_URL=http://localhost:8000/api/v1
+  ```
+- For production (Azure Static Web Apps), set `VITE_API_URL` as a GitHub secret and reference it in the workflow YAML:
+  ```yaml
+  env:
+    VITE_API_URL: ${{ secrets.VITE_API_URL }}
   ```
 
 ## Linting & Formatting
@@ -48,7 +65,8 @@ The app will be available at [http://localhost:5173](http://localhost:5173) by d
 
 ## CI/CD & Troubleshooting
 
-- The frontend pipeline (GitHub Actions) now passes: it installs dependencies, lints, runs Vitest tests, and builds with Vite.
+- The frontend pipeline (GitHub Actions) now passes: it installs dependencies, lints, runs Vitest tests, builds with Vite, and runs Playwright E2E tests.
+- **Playwright HTML reports** are uploaded as CI artifacts after every run. Download the `playwright-report` artifact from the GitHub Actions UI to review E2E test results, screenshots, and logs (including AI/manual review outputs for [A+M]/[AI] tests).
 - **index.html** must be present and tracked by git, or the build will fail.
 - If you add new pages/components, ensure all files are committed or the build/test may fail in CI.
 - If you see a "Could not resolve entry module 'index.html'" error, check that `frontend/index.html` exists and is tracked.

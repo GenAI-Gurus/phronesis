@@ -149,9 +149,24 @@ To keep your database schema in sync with your SQLAlchemy models, use Alembic mi
      docker tag phronesis-backend <youracr>.azurecr.io/phronesis-backend:latest
      docker push <youracr>.azurecr.io/phronesis-backend:latest
      ```
-2. **Configure App Service**
-   - Set environment variables (e.g., `DATABASE_URL`, `OPENAI_API_KEY`, etc.) in the Azure Portal (Configuration > Application settings).
-   - Do NOT commit secrets; use Azure Key Vault or App Service settings.
+2. **Configure App Service Secrets**
+   - In Azure Portal → Your App Service → Configuration → Application settings:
+     - Add environment variables for all secrets (e.g., `DATABASE_URL`, `OPENAI_API_KEY`, etc.).
+     - Example:
+       | Name              | Value (example)                       |
+       |-------------------|---------------------------------------|
+       | DATABASE_URL      | <Azure SQL connection string>          |
+       | OPENAI_API_KEY    | <your-openai-key>                      |
+   - These are available to your FastAPI app via `os.getenv()`.
+   - **For production:**
+     - You can reference secrets stored in Azure Key Vault using Key Vault Reference syntax:
+       - Example value:
+         ```
+         @Microsoft.KeyVault(SecretUri=https://<your-keyvault-name>.vault.azure.net/secrets/OPENAI_API_KEY/<secret-guid>)
+         ```
+     - This keeps secrets centralized and never exposes them in code or CI logs.
+   - See [Azure Key Vault References](https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references) for details.
+   - **Never commit secrets to the repository.**
 3. **Run Database Migrations**
    - Use the Azure Cloud Shell or a CI/CD step:
      ```sh
