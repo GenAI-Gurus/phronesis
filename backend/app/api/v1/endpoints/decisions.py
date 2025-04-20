@@ -52,6 +52,11 @@ def create_decision_journal_entry(
         db.commit()
         db.refresh(entry)
         return entry
+    except HTTPException as http_exc:
+        logging.error(
+            f"[ERROR] create_decision_journal_entry HTTPException: {http_exc.detail}"
+        )
+        raise
     except Exception as e:
         logging.error(
             f"[ERROR] create_decision_journal_entry failed: {e}\n{traceback.format_exc()}"
