@@ -34,6 +34,9 @@ jobs:
       - name: Copy staticwebapp.config.json to dist
         run: cp frontend/staticwebapp.config.json frontend/dist/staticwebapp.config.json
 
+      - name: List dist contents
+        run: ls -l frontend/dist/
+
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
