@@ -20,6 +20,10 @@ import datetime
 router = APIRouter()
 
 
+import logging
+import traceback
+
+
 @router.post("/journal", response_model=DecisionJournalEntryOut, status_code=201)
 def create_decision_journal_entry(
     entry_in: DecisionJournalEntryCreate,
@@ -28,33 +32,33 @@ def create_decision_journal_entry(
 ):
     """
     Create a new decision journal entry for the authenticated user.
-
-    Args:
-        entry_in (DecisionJournalEntryCreate): Journal entry data.
-        db (Session): SQLAlchemy session dependency.
-        current_user (User): The authenticated user.
-
-    Returns:
-        DecisionJournalEntry: The created entry.
     """
-    tag_result = OpenAITagger.tag_entry(entry_in.title, entry_in.context)
-    entry = DecisionJournalEntry(
-        id=str(uuid.uuid4()),
-        user_id=str(current_user.id),
-        title=entry_in.title,
-        context=entry_in.context,
-        anticipated_outcomes=entry_in.anticipated_outcomes,
-        values=entry_in.values,
-        domain_tags=tag_result["domain_tags"],
-        sentiment_tag=tag_result["sentiment_tag"],
-        keywords=tag_result["keywords"],
-        created_at=datetime.datetime.utcnow(),
-        updated_at=datetime.datetime.utcnow(),
-    )
-    db.add(entry)
-    db.commit()
-    db.refresh(entry)
-    return entry
+    try:
+        tag_result = OpenAITagger.tag_entry(entry_in.title, entry_in.context)
+        entry = DecisionJournalEntry(
+            id=str(uuid.uuid4()),
+            user_id=str(current_user.id),
+            title=entry_in.title,
+            context=entry_in.context,
+            anticipated_outcomes=entry_in.anticipated_outcomes,
+            values=entry_in.values,
+            domain_tags=tag_result["domain_tags"],
+            sentiment_tag=tag_result["sentiment_tag"],
+            keywords=tag_result["keywords"],
+            created_at=datetime.datetime.utcnow(),
+            updated_at=datetime.datetime.utcnow(),
+        )
+        db.add(entry)
+        db.commit()
+        db.refresh(entry)
+        return entry
+    except Exception as e:
+        logging.error(
+            f"[ERROR] create_decision_journal_entry failed: {e}\n{traceback.format_exc()}"
+        )
+        raise HTTPException(
+            status_code=503, detail="Internal server error (journal creation)"
+        )
 
 
 class DecisionMessageCreate(BaseModel):
