@@ -26,9 +26,23 @@ const JournalListPage: React.FC = () => {
     })();
   }, []);
 
+  const jwt = localStorage.getItem('jwt');
+  if (!jwt) {
+    return (
+      <Box mt={8} textAlign="center">
+        <Alert severity="warning">You must be logged in to view your journal.</Alert>
+        <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate('/login')}>Go to Login</Button>
+      </Box>
+    );
+  }
   if (loading) return <Box mt={8} textAlign="center"><CircularProgress /></Box>;
   if (error) return <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>;
-  if (!entries.length) return <Typography mt={8} textAlign="center">No journal entries found.</Typography>;
+  if (!entries.length) return (
+    <Box mt={8} textAlign="center">
+      <Typography>No journal entries found.</Typography>
+      <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate('/journal/new')}>+ Create New Entry</Button>
+    </Box>
+  );
 
   return (
     <Box maxWidth={700} mx="auto" mt={6}>

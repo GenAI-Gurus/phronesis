@@ -72,6 +72,11 @@ const DashboardPage: React.FC = () => {
         <Typography color="text.secondary">Loading journals...</Typography>
       ) : journalsError ? (
         <Typography color="error">{journalsError}</Typography>
+      ) : journals.length === 0 ? (
+        <Box textAlign="center" my={2}>
+          <Typography>No journal entries yet.</Typography>
+          <Button sx={{ mt: 1 }} variant="contained" onClick={() => navigate('/journal/new')}>+ Create New Entry</Button>
+        </Box>
       ) : (
         <RecentJournalsList journals={journals} />
       )}
