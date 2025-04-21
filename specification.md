@@ -1,5 +1,12 @@
 # Phronesis Product Specification (MVP)
 
+> **Documentation:**
+> - [README.md](./README.md): Project overview, setup, and key links
+> - [WORKFLOWS.md](./WORKFLOWS.md): CI/CD, automation, and deployment details
+> - [TESTING.md](./TESTING.md): All E2E, unit, and AI-assisted testing protocols
+
+> **Testing Protocols:** For all E2E, unit, and AI-assisted testing standards, see [TESTING.md](./TESTING.md).
+
 ## Project Metadata
 - GitHub Organization: genai-gurus
 - Main Repo: https://github.com/genai-gurus/phronesis
@@ -27,6 +34,15 @@ The platform should feel warm and supportive, offering encouragement and empathy
 ## Future-Self Simulator
 
 ## Life Theme
+
+## Auto-Tagging & Categorization (Backend Feature)
+- Decision journal entries are auto-tagged with `domain_tags`, `sentiment_tag`, and `keywords` on create/update using an LLM-based service (see backend/README.md).
+- All new columns are present in the DB and fully covered by migrations and Pytest.
+
+## Admin Endpoints (Internal Use)
+- `/api/v1/admin/migrate`: Triggers Alembic DB migrations in the deployed container (see backend/README.md).
+- Protected by `MIGRATE_SECRET`. Only callable by CI/CD.
+- Returns stdout, stderr, and return code for full debuggability.
 
 - **Model:**
   - `LifeTheme`: id, user_id, theme_text, created_at, updated_at
@@ -114,17 +130,19 @@ The platform should feel warm and supportive, offering encouragement and empathy
 - **Environment Variable:**
   - `OPENAI_API_KEY` (required for AI prompts)
 
-## CI/CD Status & Contributor Guidance (as of 2025-04-16)
-- LLM-as-judge integration test runs in CI for Decision Support Chat API (uses OpenAI GPT-4.1-nano as a judge).
-- Test output (including OpenAI prompts, answers, and verdicts) is printed in CI logs for transparency.
-- backend/test.db is deleted before every CI run to ensure a clean test environment.
-- Black formatting is enforced for all backend Python code and tests.
-- .env, test.db, and temporary files are gitignored and never committed.
-- All secrets (e.g., OPENAI_API_KEY) are managed via GitHub Actions secrets or .env files (never committed).
+## CI/CD & Testing (Current)
+- **Workflows:** See [WORKFLOWS.md](./WORKFLOWS.md) for all pipeline details, triggers, and deployment steps.
+- **Testing:**
+  - Unit tests: Pytest (backend), Vitest (frontend)
+  - E2E tests: Playwright (frontend, full user journeys)
+  - AI-assisted/manual review: See [TESTING.md](./TESTING.md) for QA protocol
+  - All test output is visible in CI logs for auditability
+  - Test DB is reset before every CI run
+- **Secrets:** All secrets (e.g., `OPENAI_API_KEY`, `MIGRATE_SECRET`) are managed via GitHub Actions secrets or .env files (never committed)
+- **Contributor Guidance:**
+  - Contributors must ensure all tests pass and code is formatted before merging
+  - See [TESTING.md](./TESTING.md) for detailed QA and test procedures
 
-- Both backend and frontend CI/CD pipelines (GitHub Actions) are fully passing.
-- **Backend pipeline:** Installs with Poetry, checks formatting with Black, and runs all pytest tests with `PYTHONPATH=.`. Contributors must ensure code is formatted and all tests pass before merging.
-- **Frontend pipeline:** Installs Node dependencies, lints with ESLint, runs Vitest tests, and builds with Vite. All source files (especially `index.html` and new components/pages) must be tracked by git.
 - **Troubleshooting:**
   - If backend tests fail with import errors, check `PYTHONPATH=.` and module locations.
   - If frontend build fails, ensure `index.html` is present and all relevant files are committed.
@@ -146,22 +164,17 @@ The backend is deployed to Azure App Service using a custom Docker image, which 
   - `OPENAI_API_KEY`
   - Any other environment variables needed for production.
 
-### Deployment Steps
+### Deployment & Migration (Current)
 1. **Build and Push Docker Image**
    - The GitHub Actions workflow ([.github/workflows/azure-backend.yml](.github/workflows/azure-backend.yml)) builds the Docker image and pushes it to GHCR at `ghcr.io/genai-gurus/phronesis/phronesis-backend:<sha>`.
    - The Dockerfile uses Poetry for dependency management and installs all production dependencies.
 
-2. **Configure App Service**
-   - Set environment variables in the Azure Portal under Configuration > Application settings.
-   - Never store secrets in the image or repository; always inject at runtime.
-
-3. **Update .dockerignore**
-   - `.dockerignore` excludes files such as `.env`, `secrets.*`, `*.key`, `*.pem` to prevent accidental leakage of secrets.
-
-4. **Production Dependencies**
-   - `gunicorn` must be included in `[tool.poetry.dependencies]` in `pyproject.toml` to ensure the container can start with the correct command.
-   - After adding new dependencies, always run `poetry lock` and commit the updated lock file.
-
+2. **Run Database Migrations (Production/Staging)**
+   - Migrations are triggered via the protected `/api/v1/admin/migrate` endpoint, called by the "Manual DB Migration" GitHub Actions workflow.
+   - The endpoint is protected with a strong secret (`MIGRATE_SECRET`), set both in Azure App Service and as a GitHub Actions secret.
+   - The workflow POSTs to the endpoint, which runs `poetry run alembic upgrade head` in the deployed container and returns full output for CI/CD logs.
+   - See [WORKFLOWS.md](WORKFLOWS.md) for step-by-step usage and security details.
+   - **Note:** Manual/SSH/Kudu-based migrations are deprecated. All production migrations must go through the admin endpoint and workflow for auditability and safety.
 5. **Run Database Migrations**
    - After deployment, run Alembic migrations on your production database:
      ```sh

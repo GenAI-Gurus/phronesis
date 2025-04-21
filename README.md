@@ -15,6 +15,7 @@
 - [progress.md](./progress.md): Task tracking and project progress
 - [decisions_log.md](./decisions_log.md): Key architectural and product decisions
 - [WORKFLOWS.md](./WORKFLOWS.md): All GitHub Actions CI/CD workflows
+- [TESTING.md](./TESTING.md): End-to-end, unit, and AI-assisted testing protocols
 - [backend/README.md](./backend/README.md): Backend setup and usage
 - [backend/STRUCTURE.md](./backend/STRUCTURE.md): Backend code structure and conventions
 - [frontend/README.md](./frontend/README.md): Frontend setup and usage
@@ -22,6 +23,8 @@
 - [infra/bicep/README.md](./infra/bicep/README.md): Infrastructure-as-Code and Azure deployment
 
 Phronesis is an open-source platform for mindful decision-making, reflection, and value-driven personal growth. It combines journaling, AI-powered prompts, and gamification to help users make better decisions over time.
+
+**For all testing protocols, E2E standards, and QA guidelines, see [TESTING.md](./TESTING.md).**
 
 ## Key Features
 - Conversational decision journaling (chat-based, not forms)

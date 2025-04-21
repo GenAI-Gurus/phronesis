@@ -66,16 +66,22 @@ Workflows are defined in `.github/workflows/`. They automate CI, deployment, lin
 ### 4. `manual-migrate.yml`
 - **Purpose:**
   - Run Alembic DB migrations in the deployed backend container (production or staging) via a manual trigger.
-  - Uses the Azure App Service Kudu API to execute the migration command inside the running container.
+  - Calls the protected `/api/v1/admin/migrate` endpoint in your FastAPI backend, which runs the migration inside the deployed container.
   - Ensures migrations are only run after verifying the new container is healthy and deployed.
 - **Trigger:**
   - Manual trigger from the GitHub Actions UI (`workflow_dispatch`).
 - **Usage:**
   1. Deploy backend using `azure-backend.yml` (wait for success).
-  2. In Azure Portal, go to your App Service > Deployment Center > FTPS credentials. Copy your Kudu deployment username and password.
-  3. Add these as GitHub secrets: `AZURE_KUDU_USER` and `AZURE_KUDU_PASS`.
-  4. Go to GitHub Actions, select the "Manual DB Migration" workflow, and click "Run workflow".
-  5. The workflow will use the Kudu API to run `alembic upgrade head` in your container. Output and errors are visible in the Actions log.
+  2. Set a strong `MIGRATE_SECRET` in Azure App Service (Configuration > Application settings) and as a GitHub Actions secret (`MIGRATE_SECRET`).
+  3. Go to GitHub Actions, select the "Manual DB Migration" workflow, and click "Run workflow".
+  4. The workflow will POST to `/api/v1/admin/migrate` with the secret. The backend runs `poetry run alembic upgrade head` and returns full output.
+  5. The workflow parses the response and marks the run green only if the migration was successful (`returncode == 0`).
+- **Endpoint Security:**
+  - The migration endpoint is protected by a secret (`x-migrate-secret` header, must match `MIGRATE_SECRET` env var).
+  - Only those with the secret (i.e., CI/CD) can trigger migrations.
+- **Debuggability:**
+  - The endpoint returns `stdout`, `stderr`, `returncode`, and a message for full transparency.
+  - All output is visible in the Actions log for troubleshooting.
 - **Best Practices:**
   - Consider running a backup before migration.
   - Use for both staging and production as needed.

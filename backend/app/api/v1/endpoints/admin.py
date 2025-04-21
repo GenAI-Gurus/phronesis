@@ -4,6 +4,25 @@ Admin endpoints for Phronesis backend (protected, internal use only).
 from fastapi import APIRouter, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 import subprocess
+
+"""
+Admin endpoints for Phronesis backend (internal use only).
+
+- /api/v1/admin/migrate: Trigger Alembic DB migrations (upgrade head) in the deployed container.
+- Protected by MIGRATE_SECRET (must be sent in x-migrate-secret header).
+- Only callable by CI/CD or trusted operators.
+- Returns full stdout, stderr, and return code for debuggability.
+- See backend/README.md and WORKFLOWS.md for usage.
+"""
+"""
+Admin endpoints for Phronesis backend (internal use only).
+
+- /api/v1/admin/migrate: Trigger Alembic DB migrations (upgrade head) in the deployed container.
+- Protected by MIGRATE_SECRET (must be sent in x-migrate-secret header).
+- Only callable by CI/CD or trusted operators.
+- Returns full stdout, stderr, and return code for debuggability.
+- See backend/README.md and WORKFLOWS.md for usage.
+"""
 import os
 
 router = APIRouter()

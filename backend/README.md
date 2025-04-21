@@ -105,7 +105,7 @@ A modular, expandable, and AI-friendly backend for the Phronesis platform, built
 - Challenges can be completed and tracked per user.
 - All endpoints require authentication.
 - See `app/models/gamification.py` and `app/schemas/gamification.py` for data structures.
-\n\n- **POST /api/v1/future-self/simulate**\n- **Auth:** Required (JWT Bearer)\n- **Purpose:** AI-powered simulation of user's likely \"future self\" based on a decision context, values, and optional time horizon.\n\n### Request Schema\n```json\n{\n  \"decision_context\": \"Should I move to a new city for a job opportunity?\",\n  \"values\": [\"growth\", \"security\"],\n  \"time_horizon\": \"2 years\"\n}\n```\n\n### Response Schema\n```json\n{\n  \"future_projection\": \"In two years, after moving to the new city, you have grown professionally and expanded your network. The transition was challenging at first, but you adapted and found new sources of security and fulfillment.\",\n  \"suggestions\": [\n    \"Research neighborhoods and cost of living.\",\n    \"Connect with local professional groups before moving.\",\n    \"Reflect on what you need to feel secure during transitions.\"\n  ],\n  \"ai_generated\": true\n}\n```\n\n- **Summary:** Simulate your “future self” based on a decision context and values.\n- **Description:** Uses AI to project a narrative of your likely future self given a specific decision, values, and optional time horizon.\n- **Tags:** [\"future-self\", \"simulation\", \"decision support\"]\n
+\n\n- **POST /api/v1/future-self/simulate**\n- **Auth:** Required (JWT Bearer)\n- **Purpose:** AI-powered simulation of user's likely "future self" based on a decision context, values, and optional time horizon.\n\n### Request Schema\n```json\n{\n  \"decision_context\": \"Should I move to a new city for a job opportunity?\",\n  \"values\": [\"growth\", \"security\"],\n  \"time_horizon\": \"2 years\"\n}\n```\n\n### Response Schema\n```json\n{\n  \"future_projection\": \"In two years, after moving to the new city, you have grown professionally and expanded your network. The transition was challenging at first, but you adapted and found new sources of security and fulfillment.\",\n  \"suggestions\": [\n    \"Research neighborhoods and cost of living.\",\n    \"Connect with local professional groups before moving.\",\n    \"Reflect on what you need to feel secure during transitions.\"\n  ],\n  \"ai_generated\": true\n}\n```\n\n- **Summary:** Simulate your “future self” based on a decision context and values.\n- **Description:** Uses AI to project a narrative of your likely future self given a specific decision, values, and optional time horizon.\n- **Tags:** [\"future-self\", \"simulation\", \"decision support\"]\n
 
 - **Create Session:** `POST /api/v1/decisions/sessions` — `{ "title": string }` → `{ "id": UUID, ... }`
 - **List Sessions:** `GET /api/v1/decisions/sessions`
@@ -114,26 +114,37 @@ A modular, expandable, and AI-friendly backend for the Phronesis platform, built
 - **Update Session:** `PATCH /api/v1/decisions/sessions/{session_id}`
 - All endpoints require JWT authentication and return proper status codes (401, 404, 422).
 - Full Pytest coverage: see `/backend/tests/app/api/v1/endpoints/test_decisions.py`.
+- **For detailed test protocols, E2E coverage, and manual/AI-assisted testing guidance, see [TESTING.md](../TESTING.md).**
 
-## Database Migrations (Alembic)
+## Database Migrations
 
-To keep your database schema in sync with your SQLAlchemy models, use Alembic migrations as follows:
+To apply schema changes, use Alembic migrations:
 
-### 1. Local Development (SQLite)
-- Set `DATABASE_URL=sqlite:///./dev.db` in your `.env` file.
-- Generate a new migration after changing models:
-  ```sh
-  poetry run alembic revision --autogenerate -m "Describe your change"
-  ```
+1. Make model changes in SQLAlchemy models.
+2. Generate migration:
+   ```bash
+   poetry run alembic revision --autogenerate -m "Describe your change"
+   ```
+3. Apply migration locally:
+   ```bash
+   poetry run alembic upgrade head
+   ```
 
-### 2. Production (Azure SQL)
-- Set `DATABASE_URL` to your Azure SQL connection string (from Key Vault or Azure Portal).
-- Apply all migrations to your cloud database:
-  ```sh
-  poetry run alembic upgrade head
-  ```
+### Production/Staging Migrations (CI/CD)
+- **Never run migrations manually in production.**
+- Use the protected `/api/v1/admin/migrate` endpoint, which is triggered via the "Manual DB Migration" GitHub Actions workflow.
+- The endpoint is secured with a strong secret (`MIGRATE_SECRET`).
+- The workflow POSTs to the endpoint, which runs `poetry run alembic upgrade head` in the deployed container and returns stdout/stderr/returncode for full debuggability.
+- See [WORKFLOWS.md](../WORKFLOWS.md) for details and usage instructions.
+- For troubleshooting, check the workflow logs and the Alembic output in the response.
 
-### Notes
+### Production/Staging Migrations (CI/CD)
+- **Never run migrations manually in production.**
+- Use the protected `/api/v1/admin/migrate` endpoint, which is triggered via the "Manual DB Migration" GitHub Actions workflow.
+- The endpoint is secured with a strong secret (`MIGRATE_SECRET`).
+- The workflow POSTs to the endpoint, which runs `poetry run alembic upgrade head` in the deployed container and returns stdout/stderr/returncode for full debuggability.
+- See [WORKFLOWS.md](../WORKFLOWS.md) for details and usage instructions.
+- For troubleshooting, check the workflow logs and the Alembic output in the response.
 - This ensures your schema is up to date both locally and in production.
 - See `backend/.env.example` and `backend/alembic/` for configuration and migration scripts.
 - Only generate migrations from the main branch and after verifying model changes.

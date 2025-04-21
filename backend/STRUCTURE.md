@@ -9,7 +9,10 @@ backend/
 │   │   ├── __init__.py
 │   │   ├── v1/
 │   │   │   ├── __init__.py
-│   │   │   ├── endpoints/ # Each feature in its own module
+│   │   │### Endpoints
+- All API endpoints are defined in `backend/app/api/v1/endpoints/` as modular FastAPI routers.
+- **Admin endpoints** for internal operations (e.g., DB migration) are in `backend/app/api/v1/endpoints/admin.py` and are protected for CI/CD use only.
+- **Admin endpoints** for internal operations (e.g., DB migration) are in `backend/app/api/v1/endpoints/admin.py` and are protected for CI/CD use only.
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── users.py
 │   │   │   │   ├── auth.py
