@@ -1,6 +1,7 @@
 """
 Admin endpoints for Phronesis backend (protected, internal use only).
 """
+
 from fastapi import APIRouter, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 import subprocess
@@ -53,9 +54,11 @@ def run_migration(request: Request):
                 "stdout": result.stdout,
                 "stderr": result.stderr,
                 "returncode": result.returncode,
-                "message": "Migration complete"
-                if result.returncode == 0
-                else "Migration failed",
+                "message": (
+                    "Migration complete"
+                    if result.returncode == 0
+                    else "Migration failed"
+                ),
             },
         )
     except Exception as e:
