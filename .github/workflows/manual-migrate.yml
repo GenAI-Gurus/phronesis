@@ -7,25 +7,26 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     env:
-      KUDU_USER: ${{ secrets.AZURE_KUDU_USER }}
-      KUDU_PASS: ${{ secrets.AZURE_KUDU_PASS }}
-      KUDU_SITE: "https://phronesis-backend-app.scm.azurewebsites.net"
-
+      MIGRATE_SECRET: ${{ secrets.MIGRATE_SECRET }}
+      BACKEND_URL: "https://phronesis-backend-app.azurewebsites.net"
     steps:
-      - name: Run Alembic migrations via Kudu API
+      - name: Run Alembic migrations via /api/v1/admin/migrate endpoint
         run: |
           set -e
-          echo "Running Alembic migrations via Kudu API..."
-          RESPONSE=$(curl -s -u "$KUDU_USER:$KUDU_PASS" -X POST "$KUDU_SITE/api/command" \
-            -H "Content-Type: application/json" \
-            -d '{"command": "cd /home/site/wwwroot && poetry run alembic upgrade head"}')
-          echo "$RESPONSE"
-          # Optionally fail if the response contains an error
-          if echo "$RESPONSE" | grep -i error; then
-            echo "Migration failed!"
+          echo "Triggering Alembic migrations via backend admin endpoint..."
+          RESPONSE=$(curl -s -X POST "$BACKEND_URL/api/v1/admin/migrate" \
+            -H "x-migrate-secret: $MIGRATE_SECRET" \
+            -H "Content-Type: application/json")
+          echo "Response: $RESPONSE"
+          # Extract returncode and message for CI feedback
+          RETURN_CODE=$(echo "$RESPONSE" | python3 -c 'import sys, json; print(json.load(sys.stdin).get("returncode", 1))')
+          MSG=$(echo "$RESPONSE" | python3 -c 'import sys, json; print(json.load(sys.stdin).get("message", "No message"))')
+          if [ "$RETURN_CODE" != "0" ]; then
+            echo "Migration failed! $MSG"
             exit 1
           fi
+          echo "Migration succeeded! $MSG"
 # Required secrets:
-#   - AZURE_KUDU_USER: Kudu deployment username (from Azure Portal > Deployment Center > FTPS credentials)
-#   - AZURE_KUDU_PASS: Kudu deployment password
+#   - MIGRATE_SECRET: The value of the MIGRATE_SECRET env var set in Azure App Service
+#   - (Optional) BACKEND_URL if not using the default
 # See WORKFLOWS.md for usage instructions.

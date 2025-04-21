@@ -99,6 +99,14 @@ app.include_router(
     tags=["life-theme"],
 )
 
+from app.api.v1.endpoints import admin
+
+app.include_router(
+    admin.router,
+    prefix="/api/v1",
+    tags=["admin"],
+)
+
 
 @app.get("/")
 def read_root():
