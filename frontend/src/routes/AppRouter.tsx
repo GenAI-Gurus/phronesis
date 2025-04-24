@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import DashboardPage from '../pages/DashboardPage';
+import DecisionSupportChatPage from '../pages/DecisionSupportChatPage';
 import NewDecisionPage from '../pages/NewDecisionPage';
 import JournalListPage from '../pages/JournalListPage';
 import JournalDetailPage from '../pages/JournalDetailPage';
@@ -26,6 +27,7 @@ const AppRouter: React.FC = () => (
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/chat" element={<DecisionSupportChatPage />} />
       <Route path="/journal" element={<JournalListPage />} />
       <Route path="/journal/new" element={<NewDecisionPage />} />
       <Route path="/journal/:id" element={<JournalDetailPage />} />
