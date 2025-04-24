@@ -11,8 +11,8 @@ const protectedRoutes = [
 ];
 
 // Utility to register and login a test user
-const randomEmail = () => `user${Date.now()}@testmail.com`;
-const password = 'TestPassword123!';
+
+
 
 async function setupUser(page) {
   const email = randomEmail();

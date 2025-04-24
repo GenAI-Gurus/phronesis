@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupUser, registerUser, loginUser, randomEmail, password } from './utils/userHelpers';
+import { setupUser, registerUser, loginUser } from './utils/userHelpers';
 
 
 test.describe('Life Theme Management', () => {

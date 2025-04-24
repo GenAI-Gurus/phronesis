@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { setupUser, registerUser, loginUser, randomEmail, password } from './utils/userHelpers';
 
-const randomEmail = () => `user${Date.now()}@testmail.com`;
-const password = 'TestPassword123!';
+
+
 
 // Utility to register, login, and create a journal entry for reflection
 async function setupUserAndEntry(page) {
