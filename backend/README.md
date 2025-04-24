@@ -2,6 +2,10 @@
 
 A modular, expandable, and AI-friendly backend for the Phronesis platform, built with FastAPI and structured for maintainability and future growth.
 
+For backend folder structure and conventions, see [STRUCTURE.md](./STRUCTURE.md).
+
+For full architecture and requirements, see [../specification.md](../specification.md).
+
 ---
 
 ## Decision Chat Endpoints (MVP)\n\n## Future-Self Simulator API

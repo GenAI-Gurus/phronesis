@@ -26,13 +26,8 @@ Phronesis is an open-source platform for mindful decision-making, reflection, an
 
 **For all testing protocols, E2E standards, and QA guidelines, see [TESTING.md](./TESTING.md).**
 
-## Key Features
-- Conversational decision journaling (chat-based, not forms)
-- AI-generated reflection and follow-up prompts
-- Value calibration and progress tracking
-- Gamification: streaks, badges, challenges
-- Open-source: advanced users can self-host, contribute, or extend
-- Hosted option: easy onboarding for non-technical users
+## Features & Architecture
+See [specification.md](./specification.md) for all up-to-date requirements, features, and architecture details.
 
 ## Community
 This project is maintained by the GenAI Gurus community. Contributions, bug reports, and feature suggestions are welcome!

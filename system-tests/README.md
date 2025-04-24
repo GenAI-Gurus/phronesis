@@ -39,6 +39,9 @@ npx playwright test
 - Frontend unit tests for chat UI have been skipped due to jsdom limitations.
 - E2E coverage for chat UI is provided via Playwright.
 
+## Test Methodology & Coverage
+For test philosophy, scope, and methodology, see [../TESTING.md](../TESTING.md).
+
 ## DO NOT place system tests in frontend/ anymore!
 
 ---

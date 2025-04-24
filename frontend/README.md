@@ -42,22 +42,24 @@ npm run build
 
 ## Project Structure
 
-- `src/components/` – Reusable UI components
-- `src/pages/` – Route-level pages (Login, Register, Dashboard, etc.)
-- `src/api/` – API client (Axios) and backend integration
-- `src/routes/` – React 18 Router config
+See [STRUCTURE.md](./STRUCTURE.md) for directory and modularity details.
+
+For full architecture and requirements, see [../specification.md](../specification.md).
 
 ## Environment Variables
 
-- For local development, configure the backend API URL in `.env`:
-  ```env
-  VITE_API_URL=http://localhost:8000/api/v1
-  ```
-- For production (Azure Static Web Apps), set `VITE_API_URL` as a GitHub secret and reference it in the workflow YAML:
-  ```yaml
-  env:
-    VITE_API_URL: ${{ secrets.VITE_API_URL }}
-  ```
+- **Local development:**
+  - Create a `.env` file and set your backend API URL:
+    ```env
+    VITE_API_URL=http://localhost:8000/api/v1
+    ```
+- **Production (Azure Static Web Apps):**
+  - Set `VITE_API_URL` as a GitHub secret.
+  - Reference it in your GitHub Actions workflow YAML:
+    ```yaml
+    env:
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+    ```
 
 ## Linting & Formatting
 

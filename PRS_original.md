@@ -1,3 +1,5 @@
+**WARNING:** This document is a historical reference only. The canonical, up-to-date product specification is [specification.md](./specification.md).
+
 This is the original Product Requirements Specification. DO NOT EDIT, this is here for reference only.
 
 1. Overview & Vision
