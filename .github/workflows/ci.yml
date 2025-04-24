@@ -73,7 +73,7 @@ jobs:
           if [ -f node_modules/.bin/eslint ]; then npm run lint || true; else echo 'No ESLint config found.'; fi
       - name: Run frontend tests (Vitest)
         run: |
-          if [ -f node_modules/.bin/vitest ]; then npm run test || true; else echo 'No Vitest config found.'; fi
+          if [ -f node_modules/.bin/vitest ]; then npm run test; else echo 'No Vitest config found.'; fi
       - name: Build
         run: npm run build
 
@@ -82,7 +82,7 @@ jobs:
       #   run: npx playwright install --with-deps
 
       # - name: Run Playwright E2E tests
-      #   run: npx playwright test --reporter=html
+      #   run: npx playwright test system-tests --reporter=html
       #   env:
       #     CI: true
 

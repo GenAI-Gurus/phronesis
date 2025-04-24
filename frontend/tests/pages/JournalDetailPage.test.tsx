@@ -1,11 +1,17 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import JournalDetailPage from '../../src/pages/JournalDetailPage';
+import api from '../../src/api/client';
 
 beforeEach(() => {
-  window.fetch = vi.fn();
+  vi.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
+    if (key === 'jwt') return 'FAKE_TOKEN';
+    return null;
+  });
+
 });
 afterEach(() => {
   vi.resetAllMocks();
@@ -13,9 +19,8 @@ afterEach(() => {
 
 describe('JournalDetailPage', () => {
   it('renders entry details and AI tags', async () => {
-    (window.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
+    vi.spyOn(api, 'get').mockResolvedValue({
+      data: {
         id: '1',
         title: 'Entry 1',
         created_at: '2025-04-19T08:00:00Z',
@@ -25,7 +30,7 @@ describe('JournalDetailPage', () => {
         domain_tags: ['career'],
         sentiment_tag: 'positive',
         keywords: ['promotion', 'boss', 'work'],
-      }),
+      }
     });
     render(
       <MemoryRouter initialEntries={["/journal/1"]}>
@@ -47,10 +52,7 @@ describe('JournalDetailPage', () => {
   });
 
   it('shows error on API failure', async () => {
-    (window.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({ detail: 'API error' }),
-    });
+    vi.spyOn(api, 'get').mockRejectedValue(new Error('Network Error'));
     render(
       <MemoryRouter initialEntries={["/journal/1"]}>
         <Routes>
@@ -59,7 +61,7 @@ describe('JournalDetailPage', () => {
       </MemoryRouter>
     );
     await waitFor(() => {
-      expect(screen.getByText(/api error/i)).toBeInTheDocument();
+      expect(screen.getByText(/network error/i)).toBeInTheDocument();
     });
   });
 });

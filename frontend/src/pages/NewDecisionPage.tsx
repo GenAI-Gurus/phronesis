@@ -46,6 +46,8 @@ const NewDecisionPage: React.FC = () => {
       });
       setResult(resp.data);
     } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.log('Caught error in handleSubmit:', err, 'message:', err?.message);
       setError(err.message);
     } finally {
       setLoading(false);

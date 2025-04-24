@@ -1,10 +1,16 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import JournalListPage from '../../src/pages/JournalListPage';
+import api from '../../src/api/client';
 
 beforeEach(() => {
+  vi.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
+    if (key === 'jwt') return 'FAKE_TOKEN';
+    return null;
+  });
   window.fetch = vi.fn();
 });
 afterEach(() => {
@@ -13,9 +19,8 @@ afterEach(() => {
 
 describe('JournalListPage', () => {
   it('renders a list of journal entries', async () => {
-    (window.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ([
+    vi.spyOn(api, 'get').mockResolvedValue({
+      data: [
         {
           id: '1',
           title: 'Entry 1',
@@ -29,8 +34,8 @@ describe('JournalListPage', () => {
           created_at: '2025-04-18T10:00:00Z',
           domain_tags: ['health'],
           sentiment_tag: 'neutral',
-        },
-      ]),
+        }
+      ]
     });
     render(
       <MemoryRouter>
@@ -48,10 +53,7 @@ describe('JournalListPage', () => {
   });
 
   it('shows empty state if no entries', async () => {
-    (window.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ([]),
-    });
+    vi.spyOn(api, 'get').mockResolvedValue({ data: [] });
     render(
       <MemoryRouter>
         <JournalListPage />
@@ -63,17 +65,14 @@ describe('JournalListPage', () => {
   });
 
   it('shows error on API failure', async () => {
-    (window.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({ detail: 'API error' }),
-    });
+    vi.spyOn(api, 'get').mockRejectedValue(new Error('Network Error'));
     render(
       <MemoryRouter>
         <JournalListPage />
       </MemoryRouter>
     );
     await waitFor(() => {
-      expect(screen.getByText(/api error/i)).toBeInTheDocument();
+      expect(screen.getByText(/network error/i)).toBeInTheDocument();
     });
   });
 });

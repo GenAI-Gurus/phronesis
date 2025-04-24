@@ -5,8 +5,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 /**
  * Shows full details of a Decision Journal Entry, including AI-generated tags.
  */
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const JournalDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,9 +24,8 @@ const JournalDetailPage: React.FC = () => {
     (async () => {
       try {
         const api = (await import('../api/client')).default;
-const resp = await api.get(`/decisions/journal/${id}`);
-        if (!resp.ok) throw new Error((await resp.json()).detail || 'Failed to fetch entry');
-        setEntry(await resp.json());
+        const resp = await api.get(`/decisions/journal/${id}`);
+        setEntry(resp.data);
       } catch (err: any) {
         setError(err.message);
       } finally {

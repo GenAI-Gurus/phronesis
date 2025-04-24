@@ -23,6 +23,10 @@ const mockEntries = [
 
 describe('DecisionJournalPage', () => {
   beforeEach(() => {
+  vi.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
+    if (key === 'jwt') return 'FAKE_TOKEN';
+    return null;
+  });
     vi.clearAllMocks();
   });
 

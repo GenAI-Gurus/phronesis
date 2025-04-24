@@ -1,0 +1,10 @@
+{
+  "name": "phronesis-system-tests",
+  "private": true,
+  "scripts": {
+    "test:system": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.1"
+  }
+}

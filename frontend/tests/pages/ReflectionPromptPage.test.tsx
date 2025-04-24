@@ -20,6 +20,10 @@ const generateReflectionPrompts = vi.mocked(realGenerateReflectionPrompts);
 
 describe('ReflectionPromptPage', () => {
   beforeEach(() => {
+  vi.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
+    if (key === 'jwt') return 'FAKE_TOKEN';
+    return null;
+  });
     vi.clearAllMocks();
   });
 
