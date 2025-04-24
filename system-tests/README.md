@@ -21,6 +21,8 @@ npx playwright test
   - Mobile Safari (iPhone 15 Pro)
 - **Video and screenshots are recorded for every test** and available in the Playwright HTML report.
 - **No local server is needed.**
+- **Note:** The frontend is currently running React 18 due to compatibility requirements with UI libraries and CI.
+- **The /chat route is required for chat system tests.**
 - To view the latest report after a run:
   ```bash
   npx playwright show-report
@@ -29,6 +31,13 @@ npx playwright test
 ## Test Structure
 - All test files use Playwright and share helpers from `utils/userHelpers.ts`.
 - Tests are named after the feature or flow they cover.
+- Chat system tests use Playwright to robustly check for AI replies, not just user messages.
+- System test selectors and approach have been updated for Chatscope UI (contenteditable input).
+- **Troubleshooting:** If the backend/API is not returning AI replies, check the API logs for errors.
+
+## Known Limitations
+- Frontend unit tests for chat UI have been skipped due to jsdom limitations.
+- E2E coverage for chat UI is provided via Playwright.
 
 ## DO NOT place system tests in frontend/ anymore!
 

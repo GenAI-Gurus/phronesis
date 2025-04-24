@@ -45,7 +45,7 @@ npm run build
 - `src/components/` – Reusable UI components
 - `src/pages/` – Route-level pages (Login, Register, Dashboard, etc.)
 - `src/api/` – API client (Axios) and backend integration
-- `src/routes/` – React Router config
+- `src/routes/` – React 18 Router config
 
 ## Environment Variables
 
@@ -71,6 +71,10 @@ npm run build
 - If you add new pages/components, ensure all files are committed or the build/test may fail in CI.
 - If you see a "Could not resolve entry module 'index.html'" error, check that `frontend/index.html` exists and is tracked.
 - See the main project README for more CI/CD troubleshooting tips.
+- **Note:** React 18 downgrade for compatibility with UI libraries (Chatscope, MUI, etc.)
+- **Chat UI:** The `/chat` route is now available for users and system tests. Chat UI is built with `@chatscope/chat-ui-kit-react` and uses a `contenteditable` input, not a standard textarea.
+- **System Tests:** Frontend tests for chat UI are skipped in CI due to jsdom limitations; E2E/system tests provide coverage. To run system tests for chat, use the following selectors: `[data-testid="chat-input"] [contenteditable="true"]` and `.cs-message--incoming` for AI messages.
+- **Troubleshooting:** If no AI reply is shown, check backend API and OpenAI config.
 
 ## Demo & Placeholder Pages
 

@@ -10,6 +10,7 @@
 - Reviewers can download the `playwright-report` artifact from the GitHub Actions UI to view detailed results, screenshots, logs, and outputs for [A], [AI], and [A+M] tests.
 - Manual/AI reviewers should follow the protocol in this document to review flagged outputs and spot-check results after each CI run.
 - For fast post-deploy health checks, a smoke test can be added to deploy workflows (see WORKFLOWS.md).
+- Note: React 18 is required for CI and system test compatibility.
 
 ## 1. Scope
 Test the entire user journey and all major features as deployed in production:
@@ -17,7 +18,7 @@ Test the entire user journey and all major features as deployed in production:
 - Decision journal (create, edit, list, view)
 - Reflection prompts (AI and fallback)
 - Value calibration (check-in, history)
-- Decision support chat (AI-powered)
+- Decision support chat (AI-powered) via /chat route
 - Gamification (streaks, badges, challenges)
 - Life theme management
 - Security, error handling, and environment variable loading
@@ -64,7 +65,7 @@ Test the entire user journey and all major features as deployed in production:
 - [A] Edge: Submit invalid or duplicate check-ins
 
 ### 4.5. Decision Support Chat
-- [A+M] Start a new chat session, send messages, receive AI responses
+- [A+M] Start a new chat session, send messages, receive AI responses and verify AI replies by counting .cs-message--incoming
 - [A+M] Handle fallback logic if AI is unavailable
 - [A] End and resume chat sessions
 
