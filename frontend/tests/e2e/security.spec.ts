@@ -1,4 +1,5 @@
-import { test, expect, request } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { setupUser, registerUser, loginUser, randomEmail, password } from './utils/userHelpers';
 
 const protectedRoutes = [
   '/journal',
@@ -15,14 +16,10 @@ const password = 'TestPassword123!';
 
 async function setupUser(page) {
   const email = randomEmail();
-  await page.goto('/register');
-  await page.fill('input[name="email"]', email);
-  await page.fill('input[name="password"]', password);
+  await registerUser(page, email, password);
   await page.click('button[type="submit"]');
   await expect(page.getByText(/registration successful/i)).toBeVisible();
-  await page.goto('/login');
-  await page.fill('input[name="email"]', email);
-  await page.fill('input[name="password"]', password);
+  await loginUser(page, email, password);
   await page.click('button[type="submit"]');
   await expect(page.getByText(/dashboard|welcome|logout/i)).toBeVisible();
 }

@@ -1,7 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const randomEmail = () => `user${Date.now()}_${Math.floor(Math.random() * 1e6)}@testmail.com`;
-const password = 'TestPassword123!';
+import { setupUser, registerUser, loginUser, randomEmail, password } from './utils/userHelpers';
 
 // Adjust selectors as needed to match your actual UI
 
@@ -9,10 +7,7 @@ test.describe('User Registration & Authentication', () => {
   test.describe.configure({ mode: 'serial' });
   test('Register a new user and handle duplicate', async ({ page }) => {
     const email = randomEmail();
-    await page.goto('/register');
-    await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Password').fill(password);
-    await page.click('button[type="submit"]');
+    await registerUser(page, email, password);
     // Extra logging for debugging registration failures
     const successVisible = await page.getByText(/registration successful/i).isVisible().catch(() => false);
     if (!successVisible) {
@@ -56,18 +51,8 @@ test.describe('User Registration & Authentication', () => {
 
   test('Session persists and protected routes accessible after login', async ({ page }) => {
     const email = randomEmail();
-    await page.goto('/register');
-    await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Password').fill(password);
-    await page.click('button[type="submit"]');
-    await expect(page.getByText(/registration successful/i)).toBeVisible();
-
-    // Login
-    await page.goto('/login');
-    await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Password').fill(password);
-    await page.click('button[type="submit"]');
-    await expect(page.getByText(/dashboard|welcome|logout/i)).toBeVisible();
+    await registerUser(page, email, password);
+    await loginUser(page, email, password);
 
     // Check JWT is present in localStorage after login
     const jwt = await page.evaluate(() => localStorage.getItem('jwt'));
@@ -78,7 +63,7 @@ test.describe('User Registration & Authentication', () => {
     await expect(page.getByText(/dashboard|welcome|logout/i)).toBeVisible();
 
     await page.goto('/journal');
-    await expect(page.getByText(/journal|entry|new decision/i)).toBeVisible();
+    await expect(page.getByText('No journal entries found.')).toBeVisible();
   });
 
   test('JWT is issued and used for all protected endpoints', async ({ page, context }) => {
@@ -102,10 +87,14 @@ test.describe('User Registration & Authentication', () => {
 
     // Try accessing a protected route (simulate API call)
     await page.goto('/journal');
-    await expect(page.getByText(/journal|entry|new decision/i)).toBeVisible();
+    await expect(page.getByText('No journal entries found.')).toBeVisible();
     // Remove JWT and try again (simulate logout)
     await page.evaluate(() => localStorage.removeItem('jwt'));
     await page.goto('/journal');
-    await expect(page.getByText(/login|unauthorized|token/i)).toBeVisible();
+    await Promise.any([
+  expect(page.getByText('You must be logged in to view your journal.')).toBeVisible(),
+  expect(page.getByRole('heading', { name: 'Login' })).toBeVisible(),
+  expect(page.getByRole('button', { name: 'LOGIN' })).toBeVisible(),
+]);
   });
 });
