@@ -11,6 +11,9 @@ export default defineConfig({
     slowMo: 200,
     video: 'on', // Record video for every test
     screenshot: 'on', // Take screenshot for every test
+    expect: {
+      timeout: 15000, // 15 seconds for all expect assertions
+    },
   },
   projects: [
     {

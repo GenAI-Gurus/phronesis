@@ -53,3 +53,4 @@ backend/test.db
 .env.development
 .env.test
 # .env.example
+test-results/.last-run.json
