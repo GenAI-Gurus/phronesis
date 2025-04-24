@@ -1,16 +1,16 @@
 import React, { useState, useRef } from 'react';
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Stack,
-  CircularProgress,
-  Chip,
-} from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
 import axios from 'axios';
+import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import {
+  MainContainer,
+  ChatContainer,
+  MessageList,
+  Message,
+  MessageInput,
+  TypingIndicator,
+  Avatar,
+} from "@chatscope/chat-ui-kit-react";
+
 
 interface Message {
   role: 'user' | 'ai';
@@ -25,13 +25,7 @@ const DecisionSupportChatPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const chatRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    if (chatRef.current) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    }
-  };
+  const chatRef = useRef<any>(null);
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
@@ -48,7 +42,9 @@ const DecisionSupportChatPage: React.FC = () => {
         { role: 'ai', content: response.data.reply },
       ]);
       setSuggestions(response.data.suggestions || []);
-      setTimeout(scrollToBottom, 50);
+      setTimeout(() => {
+        if (chatRef.current) chatRef.current.scrollToBottom();
+      }, 50);
     } catch (e: any) {
       setError(e?.response?.data?.detail || 'Failed to get AI response.');
     } finally {
@@ -56,103 +52,71 @@ const DecisionSupportChatPage: React.FC = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim() && !loading) {
-      sendMessage(input);
-    }
-  };
-
-  const handleSuggestionClick = (text: string) => {
-    if (!loading) {
-      sendMessage(text);
+  const handleSend = (val: string) => {
+    if (val.trim() && !loading) {
+      sendMessage(val);
     }
   };
 
   return (
-    <Box maxWidth={600} mx="auto" mt={6}>
-      <Paper elevation={3} sx={{ p: 3, minHeight: 500, display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="h5" mb={2}>Decision Support Chat</Typography>
-        <Box
-          ref={chatRef}
-          sx={{ flex: 1, overflowY: 'auto', mb: 2, maxHeight: 350, border: '1px solid #eee', borderRadius: 1, p: 2 }}
-          data-testid="chat-history"
-        >
-          {messages.length === 0 && (
-            <Typography color="text.secondary">Start the conversation by describing your decision or dilemma.</Typography>
-          )}
-          {messages.map((msg, idx) => (
-            <Box
-              key={idx}
-              sx={{
-                mb: 2,
-                textAlign: msg.role === 'user' ? 'right' : 'left',
-              }}
-            >
-              <Paper
-                sx={{
-                  display: 'inline-block',
-                  px: 2,
-                  py: 1,
-                  bgcolor: msg.role === 'user' ? 'primary.main' : 'grey.100',
-                  color: msg.role === 'user' ? 'primary.contrastText' : 'text.primary',
+    <div style={{ maxWidth: 600, margin: '40px auto' }}>
+      <MainContainer>
+        <ChatContainer>
+          <MessageList
+            typingIndicator={loading ? <TypingIndicator content="AI is thinking..." /> : undefined}
+            ref={chatRef}
+          >
+            {messages.length === 0 && (
+              <Message model={{
+                message: "Start the conversation by describing your decision or dilemma.",
+                sentTime: "just now",
+                sender: "AI"
+              }} />
+            )}
+            {messages.map((msg, idx) => (
+              <Message
+                key={idx}
+                model={{
+                  message: msg.content,
+                  sentTime: "just now",
+                  sender: msg.role === 'user' ? 'You' : 'AI',
+                  direction: msg.role === 'user' ? 'outgoing' : 'incoming',
                 }}
-              >
-                {msg.content}
-              </Paper>
-            </Box>
-          ))}
-          {loading && (
-            <Box sx={{ textAlign: 'left', mb: 2 }}>
-              <CircularProgress size={24} />
-              <Typography variant="caption" ml={1}>AI is thinking...</Typography>
-            </Box>
-          )}
-        </Box>
-        {error && <Typography color="error" mb={1} data-testid="chat-error">{error}</Typography>}
-        <form onSubmit={handleSend} style={{ display: 'flex', gap: 8 }}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            size="small"
+                avatarPosition={msg.role === 'user' ? 'tr' : 'tl'}
+                avatar={msg.role === 'user' ? <Avatar name="You" /> : <Avatar name="AI" />}
+              />
+            ))}
+          </MessageList>
+          <MessageInput
             placeholder="Type your message..."
             value={input}
-            onChange={handleInputChange}
+            onChange={setInput}
+            onSend={handleSend}
+            attachButton={false}
             disabled={loading}
             data-testid="chat-input"
           />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            endIcon={<SendIcon />}
-            disabled={!input.trim() || loading}
-            data-testid="send-btn"
-          >
-            Send
-          </Button>
-        </form>
-        {suggestions.length > 0 && (
-          <Stack direction="row" spacing={1} mt={2}>
-            {suggestions.map((s, i) => (
-              <Chip
-                key={i}
-                label={s}
-                onClick={() => handleSuggestionClick(s)}
-                color="secondary"
-                variant="outlined"
-                disabled={loading}
-                data-testid={`suggestion-${i}`}
-              />
-            ))}
-          </Stack>
-        )}
-      </Paper>
-    </Box>
+          {error && (
+            <div style={{ color: 'red', marginTop: 8 }}>{error}</div>
+          )}
+          {suggestions.length > 0 && (
+            <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  style={{ padding: '4px 12px', borderRadius: 16, border: '1px solid #aaa', cursor: 'pointer', background: '#f5f5f5' }}
+                  onClick={() => handleSend(s)}
+                  disabled={loading}
+                  data-testid={`suggestion-${i}`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+        </ChatContainer>
+      </MainContainer>
+    </div>
   );
 };
 
