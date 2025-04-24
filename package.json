@@ -5,6 +5,6 @@
     "test:system": "playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "^1.42.1"
+    "@playwright/test": "^1.52.0"
   }
 }

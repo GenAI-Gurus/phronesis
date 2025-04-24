@@ -14,6 +14,18 @@ cd system-tests
 npx playwright test
 ```
 
+- **Tests run against the deployed production frontend:** https://ambitious-ground-0a5060803.6.azurestaticapps.net/
+- **Browsers/devices covered:**
+  - Desktop Chrome
+  - Mobile Chrome (Pixel 5)
+  - Mobile Safari (iPhone 15 Pro)
+- **Video and screenshots are recorded for every test** and available in the Playwright HTML report.
+- **No local server is needed.**
+- To view the latest report after a run:
+  ```bash
+  npx playwright show-report
+  ```
+
 ## Test Structure
 - All test files use Playwright and share helpers from `utils/userHelpers.ts`.
 - Tests are named after the feature or flow they cover.
