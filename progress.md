@@ -3,6 +3,10 @@
 _This file tracks the status of all project tasks, milestones, and discovered work. For requirements and architecture, see specification.md._
 
 ## In Progress
+- [ ] Implement Chat for a New decision, instead of a form based approach
+    - The canonical specification and prompt engineering for the Decision Chat feature are documented in [docs/decision_chat_design.md](docs/decision_chat_design.md). All implementation, testing, and future enhancements should align with this document.
+
+## Upcoming / TODO
 - [ ] Implement Optional Social Login
 - [ ] Integrate Speech-to-Text (Optional)
 - [ ] Set Up Push Notifications
@@ -10,11 +14,7 @@ _This file tracks the status of all project tasks, milestones, and discovered wo
 - [ ] Build Analytics & Reporting Module
 - [ ] Construct an Admin Dashboard
 - [ ] Integrate Application Insights
-- [ ] Establish Automated Testing
 - [ ] Perform Load and Stress Testing
-- [ ] Deploy MVP to Production
-
-## Upcoming / TODO
 - [ ] Continue to improve safety and robustness of automated DB migrations (see .github/workflows/azure-backend.yml and specification.md)
     - Add pre-migration backup, manual approval for production, and/or rollback strategy.
     - Review Azure App Service + Alembic best practices for zero-downtime and safe schema changes.

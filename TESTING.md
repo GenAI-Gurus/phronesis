@@ -65,9 +65,8 @@ Test the entire user journey and all major features as deployed in production:
 - [A] Edge: Submit invalid or duplicate check-ins
 
 ### 4.5. Decision Support Chat
-- [A+M] Start a new chat session, send messages, receive AI responses and verify AI replies by counting .cs-message--incoming
-- [A+M] Handle fallback logic if AI is unavailable
-- [A] End and resume chat sessions
+
+> **Canonical Test Plan:** All system E2E tests and acceptance criteria for Decision Chat are now maintained in [system-tests/decision_chat_e2e_tests.md](system-tests/decision_chat_e2e_tests.md). This supersedes any previous list here.
 
 ### 4.6. Gamification
 - [A] Earn streaks and badges through repeated actions
