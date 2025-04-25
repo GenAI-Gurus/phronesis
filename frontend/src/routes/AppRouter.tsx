@@ -26,7 +26,7 @@ const AppRouter: React.FC = () => (
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/chat" element={<DecisionSupportChatPage />} />
+      <Route path="/decisions/:decisionId/chat" element={<DecisionSupportChatPage />} />
       <Route path="/journal" element={<JournalListPage />} />
       <Route path="/journal/new" element={<NewDecisionPage />} />
       <Route path="/journal/:id" element={<JournalDetailPage />} />
