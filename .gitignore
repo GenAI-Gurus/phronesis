@@ -54,3 +54,4 @@ backend/test.db
 .env.test
 # .env.example
 test-results/.last-run.json
+registerUser-debug-*

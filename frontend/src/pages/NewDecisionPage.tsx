@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 const NewDecisionPage: React.FC = () => {
   const [form, setForm] = useState({
     title: '',
-    context: '',
+    description: '',
   });
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +40,7 @@ const NewDecisionPage: React.FC = () => {
     try {
       const resp = await api.post(`${import.meta.env.VITE_API_URL}/decisions/journal`, {
         title: form.title,
-        context: form.context,
+        description: form.description,
       });
       setResult(resp.data);
     } catch (err: any) {
@@ -77,9 +77,9 @@ const NewDecisionPage: React.FC = () => {
               fullWidth
             />
             <TextField
-              label="Context"
-              name="context"
-              value={form.context}
+              label="Description"
+              name="description"
+              value={form.description}
               onChange={handleChange}
               required
               fullWidth
