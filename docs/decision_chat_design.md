@@ -50,7 +50,7 @@ Replace the traditional form-based decision journal entry with a conversational,
      - Status categories: In Progress, Closed. Archived decisions are hidden by default and only shown if the user presses "Show Archived".
    - Within each category, decisions are shown with title, description, summary, and last updated date, sorted by last updated.
    - User can:
-     - Click "New Decision" to create a new decision (providing title and description).
+     - Click "New Decision" to create a new decision (providing title and description). After submitting, the user is immediately brought to the chat UI for that decision, where the AI initiates the conversation based on the title and description.
      - Select an existing decision to continue working on it.
 
 2. **Resume or Start a Session**

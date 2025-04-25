@@ -26,13 +26,15 @@
     - [x] Display session summary in the UI
 
 ## 3. Link Chat to Decisions
+- [x] After creating a new decision, immediately redirect the user to the chat UI for that decision, passing the decisionId from the backend response.
 - [ ] Ensure all chat sessions/messages are associated with a specific decision (pass decision ID on create/fetch)
-- [ ] Display decision context (title, description, tags) in the chat UI
+- [x] Display decision context (title, description, tags) in the chat UI
 
 ## 4. Enhance LLM/AI Flows
-- [ ] Use `/chat` endpoint for AI completions, always including full session history
-- [ ] Store both user and AI messages in backend for audit/replay
-- [ ] Display AI suggestions in the UI as actionable buttons
+- [x] Use `/chat` endpoint for AI completions, always including full session history
+- [x] Store both user and AI messages in backend for audit/replay
+- [x] Display AI suggestions in the UI as actionable buttons
+- [x] Unit tests cover the full sendMessage flow and error handling
 
 ## 5. Validate with System Tests
 - [ ] After each increment, run Playwright system tests for chat (chat.spec.ts)

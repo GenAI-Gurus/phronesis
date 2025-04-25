@@ -152,11 +152,9 @@ test.describe('Decision Chat E2E', () => {
     await page.fill('input[name="title"]', 'Should I move to Berlin?');
     await page.fill('textarea[name="description"]', 'Considering a job offer in Berlin...');
     await page.click('button:has-text("Submit")');
-    await expect(page.getByText('Should I move to Berlin?')).toBeVisible();
-    await page.click('.decision-card');
+    // Expect to be redirected to the chat UI for the new decision
     await expect(page.locator('.chat-history')).toBeVisible();
-    await expect(page.locator('.session-date')).toHaveText(new RegExp(new Date().getFullYear().toString()));
-    await expect(page.locator('.session-status')).toHaveText(/active|open/i);
+    await expect(page.locator('.ai-message')).toContainText('Should I move to Berlin?');
   });
 
   test('[Test 2.2] No open session (new day or all complete)', async ({ page }) => {

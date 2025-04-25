@@ -28,6 +28,13 @@ const NewDecisionPage: React.FC = () => {
     }
   }, [navigate]);
 
+  // Redirect to chat UI after successful creation
+  useEffect(() => {
+    if (result && result.id) {
+      navigate(`/decisions/${result.id}/chat`);
+    }
+  }, [result, navigate]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };

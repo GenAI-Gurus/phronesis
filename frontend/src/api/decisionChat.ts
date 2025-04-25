@@ -19,6 +19,12 @@ export interface Message {
   created_at?: string;
 }
 
+// Fetch a decision by ID
+export async function getDecisionById(decisionId: string) {
+  const { data } = await axios.get(`/api/v1/decisions/${decisionId}`);
+  return data;
+}
+
 // 1. Get or create a session for today for a given decision
 export async function getOrCreateSession(decisionId: string): Promise<Session> {
   const { data: sessions } = await axios.get('/api/v1/sessions', { params: { decision_id: decisionId } });

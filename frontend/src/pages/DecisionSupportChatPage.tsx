@@ -10,7 +10,7 @@ import {
   TypingIndicator
 } from "@chatscope/chat-ui-kit-react";
 
-import { getOrCreateSession, getSessionMessages, postSessionMessage, endSession, Session } from '../api/decisionChat';
+import { getOrCreateSession, getSessionMessages, postSessionMessage, endSession, getDecisionById, Session } from '../api/decisionChat';
 import { useParams } from 'react-router-dom';
 
 const DecisionSupportChatPage: React.FC = () => {
@@ -18,6 +18,7 @@ const DecisionSupportChatPage: React.FC = () => {
   const { decisionId } = useParams<{ decisionId: string }>();
   const [session, setSession] = useState<Session | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
+  const [decision, setDecision] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [input, setInput] = useState('');
@@ -30,6 +31,10 @@ const DecisionSupportChatPage: React.FC = () => {
       setError(null);
       try {
         if (!decisionId) return;
+        // Fetch decision context
+        const dec = await getDecisionById(decisionId);
+        setDecision(dec);
+        // Fetch or create session and messages
         const sess = await getOrCreateSession(decisionId);
         setSession(sess);
         const msgs = await getSessionMessages(sess.id);
@@ -51,16 +56,20 @@ const DecisionSupportChatPage: React.FC = () => {
     try {
       // 1. Persist user message to backend
       const userMsg = await postSessionMessage(session.id, { sender: 'user', content });
-      setMessages((prev) => [...prev, userMsg]);
-      // 2. Call AI chat endpoint
+      // 2. Fetch latest messages (including the new user message)
+      const updatedMessages = await getSessionMessages(session.id);
+      setMessages(updatedMessages);
+      // 3. Call AI chat endpoint with full message history
       const response = await axios.post('/api/decision-support/chat', {
-        messages: [...messages, { sender: 'user', content }],
+        messages: updatedMessages.map(m => ({ role: m.sender, content: m.content })),
       });
       const aiReply = response.data.reply;
-      // 3. Persist AI reply to backend
+      // 4. Persist AI reply to backend
       const aiMsg = await postSessionMessage(session.id, { sender: 'ai', content: aiReply });
-      setMessages((prev) => [...prev, aiMsg]);
-      // 4. Handle suggestions
+      // 5. Fetch all messages again (for audit/replay correctness)
+      const finalMessages = await getSessionMessages(session.id);
+      setMessages(finalMessages);
+      // 6. Handle suggestions
       setSuggestions(response.data.suggestions || []);
       setTimeout(() => {
         if (chatRef.current) chatRef.current.scrollToBottom();
@@ -71,6 +80,7 @@ const DecisionSupportChatPage: React.FC = () => {
   };
 
 
+
   const handleSend = (val: string) => {
     if (val.trim() && !loading) {
       sendMessage(val);
@@ -79,6 +89,27 @@ const DecisionSupportChatPage: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 600, margin: '40px auto' }}>
+      {/* Decision context header */}
+      {decision && (
+        <div style={{ marginBottom: 16 }}>
+          <h3 style={{ margin: 0 }}>{decision.title}</h3>
+          <div style={{ color: '#555', marginBottom: 4 }}>{decision.description}</div>
+          {decision.domain_tags && decision.domain_tags.length > 0 && (
+            <div style={{ marginBottom: 4 }}>
+              <b>Domain:</b> {decision.domain_tags.map((tag: string) => (
+                <span key={tag} style={{ marginRight: 8 }}>{tag}</span>
+              ))}
+            </div>
+          )}
+          {decision.keywords && decision.keywords.length > 0 && (
+            <div style={{ marginBottom: 4 }}>
+              <b>Keywords:</b> {decision.keywords.map((kw: string) => (
+                <span key={kw} style={{ marginRight: 8 }}>{kw}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       <MainContainer>
         <ChatContainer>
           <MessageList
