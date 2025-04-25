@@ -147,6 +147,12 @@ test.describe('Decision Chat E2E', () => {
   test('[Test 2.1] Open session from today', async ({ page }) => {
     await setupUser(page);
     await page.goto('/dashboard');
+    // Ensure a decision exists before clicking
+    await page.click('text=New Decision');
+    await page.fill('input[name="title"]', 'Should I move to Berlin?');
+    await page.fill('textarea[name="description"]', 'Considering a job offer in Berlin...');
+    await page.click('button:has-text("Submit")');
+    await expect(page.getByText('Should I move to Berlin?')).toBeVisible();
     await page.click('.decision-card');
     await expect(page.locator('.chat-history')).toBeVisible();
     await expect(page.locator('.session-date')).toHaveText(new RegExp(new Date().getFullYear().toString()));
