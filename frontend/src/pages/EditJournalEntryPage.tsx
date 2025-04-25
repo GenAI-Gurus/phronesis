@@ -6,8 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 /**
  * Edit form for Decision Journal Entry. On submit, updates entry and displays updated tags.
  */
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 
 const EditJournalEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +33,7 @@ const EditJournalEntryPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const resp = await fetch(`/api/decisions/journal/${id}`);
+        const resp = await window.fetch(`/api/decisions/journal/${id}`);
         if (!resp.ok) throw new Error((await resp.json()).detail || 'Failed to fetch entry');
         const data = await resp.json();
         setOriginal(data);

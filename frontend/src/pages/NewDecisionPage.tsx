@@ -14,8 +14,6 @@ const NewDecisionPage: React.FC = () => {
   const [form, setForm] = useState({
     title: '',
     context: '',
-    anticipated_outcomes: '',
-    values: '',
   });
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -41,8 +39,8 @@ const NewDecisionPage: React.FC = () => {
     setResult(null);
     try {
       const resp = await api.post(`${import.meta.env.VITE_API_URL}/decisions/journal`, {
-        ...form,
-        values: form.values.split(',').map(v => v.trim()).filter(Boolean),
+        title: form.title,
+        context: form.context,
       });
       setResult(resp.data);
     } catch (err: any) {
@@ -88,24 +86,7 @@ const NewDecisionPage: React.FC = () => {
               multiline
               minRows={2}
             />
-            <TextField
-              label="Anticipated Outcomes"
-              name="anticipated_outcomes"
-              value={form.anticipated_outcomes}
-              onChange={handleChange}
-              required
-              fullWidth
-              multiline
-              minRows={2}
-            />
-            <TextField
-              label="Values (comma-separated)"
-              name="values"
-              value={form.values}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
+
             <Button type="submit" variant="contained" disabled={loading}>
               {loading ? 'Submitting...' : 'Submit'}
             </Button>

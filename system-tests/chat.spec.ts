@@ -162,6 +162,12 @@ test.describe('Decision Chat E2E', () => {
   test('[Test 2.2] No open session (new day or all complete)', async ({ page }) => {
     await setupUser(page);
     await page.goto('/dashboard');
+    // Ensure a decision exists before clicking
+    await page.click('text=New Decision');
+    await page.fill('input[name="title"]', 'Should I move to Berlin?');
+    await page.fill('textarea[name="description"]', 'Considering a job offer in Berlin...');
+    await page.click('button:has-text("Submit")');
+    await expect(page.getByText('Should I move to Berlin?')).toBeVisible();
     await page.click('.decision-card');
     // Simulate session completion or new day
     await page.evaluate(() => window.simulateSessionComplete = true);
@@ -174,6 +180,12 @@ test.describe('Decision Chat E2E', () => {
   test('[Test 2.3] Auto-completion of previous session', async ({ page }) => {
     await setupUser(page);
     await page.goto('/dashboard');
+    // Ensure a decision exists before clicking
+    await page.click('text=New Decision');
+    await page.fill('input[name="title"]', 'Should I move to Berlin?');
+    await page.fill('textarea[name="description"]', 'Considering a job offer in Berlin...');
+    await page.click('button:has-text("Submit")');
+    await expect(page.getByText('Should I move to Berlin?')).toBeVisible();
     await page.click('.decision-card');
     // Simulate new day
     await page.evaluate(() => window.simulateNewDay = true);
@@ -185,6 +197,12 @@ test.describe('Decision Chat E2E', () => {
   test('[Test 2.4] Manual session completion', async ({ page }) => {
     await setupUser(page);
     await page.goto('/dashboard');
+    // Ensure a decision exists before clicking
+    await page.click('text=New Decision');
+    await page.fill('input[name="title"]', 'Should I move to Berlin?');
+    await page.fill('textarea[name="description"]', 'Considering a job offer in Berlin...');
+    await page.click('button:has-text("Submit")');
+    await expect(page.getByText('Should I move to Berlin?')).toBeVisible();
     await page.click('.decision-card');
     await page.click('button:has-text("End Session")');
     await expect(page.locator('.session-status')).toHaveText(/completed|closed/i);
@@ -194,6 +212,12 @@ test.describe('Decision Chat E2E', () => {
   test('[Test 2.5] Read-only completed sessions', async ({ page }) => {
     await setupUser(page);
     await page.goto('/dashboard');
+    // Ensure a decision exists before clicking
+    await page.click('text=New Decision');
+    await page.fill('input[name="title"]', 'Should I move to Berlin?');
+    await page.fill('textarea[name="description"]', 'Considering a job offer in Berlin...');
+    await page.click('button:has-text("Submit")');
+    await expect(page.getByText('Should I move to Berlin?')).toBeVisible();
     await page.click('.decision-card');
     await page.click('button:has-text("End Session")');
     await expect(page.locator('.chat-input')).toBeHidden();

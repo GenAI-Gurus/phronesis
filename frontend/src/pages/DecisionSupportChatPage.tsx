@@ -7,20 +7,18 @@ import {
   MessageList,
   Message as ChatUIMessage,
   MessageInput,
-  TypingIndicator,
-  Avatar,
+  TypingIndicator
 } from "@chatscope/chat-ui-kit-react";
 
-import { getOrCreateSession, getSessionMessages, postSessionMessage, endSession, Session, Message as ChatMessage } from '../api/decisionChat';
+import { getOrCreateSession, getSessionMessages, postSessionMessage, endSession, Session } from '../api/decisionChat';
 import { useParams } from 'react-router-dom';
 
 const DecisionSupportChatPage: React.FC = () => {
   // Accept decisionId from route params (or as a prop if you prefer)
   const { decisionId } = useParams<{ decisionId: string }>();
   const [session, setSession] = useState<Session | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -45,37 +43,9 @@ const DecisionSupportChatPage: React.FC = () => {
     initSessionAndMessages();
   }, [decisionId]);
 
-  async function handleEndSession() {
-    if (!session) return;
-    setSending(true);
-    try {
-      const updated = await endSession(session.id);
-      setSession(updated);
-    } catch {
-      setError('Failed to end session.');
-    } finally {
-      setSending(false);
-    }
-  }
-
-  async function handleStartNewSession() {
-    setLoading(true);
-    try {
-      if (!decisionId) return;
-      const newSession = await getOrCreateSession(decisionId);
-      setSession(newSession);
-      const msgs = await getSessionMessages(newSession.id);
-      setMessages(msgs);
-    } catch {
-      setError('Failed to start new session.');
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const sendMessage = async (content: string) => {
     if (!content.trim() || !session) return;
-    setSending(true);
     setError(null);
     setInput('');
     try {
@@ -95,12 +65,11 @@ const DecisionSupportChatPage: React.FC = () => {
       setTimeout(() => {
         if (chatRef.current) chatRef.current.scrollToBottom();
       }, 50);
-    } catch (e: any) {
-      setError(e?.response?.data?.detail || 'Failed to send message or get AI reply.');
-    } finally {
-      setSending(false);
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || 'Failed to send message or get AI reply.');
     }
   };
+
 
   const handleSend = (val: string) => {
     if (val.trim() && !loading) {

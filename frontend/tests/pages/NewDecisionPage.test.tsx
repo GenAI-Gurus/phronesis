@@ -76,14 +76,12 @@ describe('NewDecisionPage', () => {
       }),
     });
     render(
-  <MemoryRouter>
-    <NewDecisionPage />
-  </MemoryRouter>
-);
+      <MemoryRouter>
+        <NewDecisionPage />
+      </MemoryRouter>
+    );
     fireEvent.change(screen.getByLabelText(/title/i, { exact: false }), { target: { value: 'Test Title' } });
     fireEvent.change(screen.getByLabelText(/context/i, { exact: false }), { target: { value: 'Test context' } });
-    fireEvent.change(screen.getByLabelText(/anticipated outcomes/i, { exact: false }), { target: { value: 'Outcome' } });
-    fireEvent.change(screen.getByLabelText(/values/i, { exact: false }), { target: { value: 'integrity' } });
     fireEvent.click(screen.getByRole('button', { name: /submit/i }));
     await waitFor(() => {
       expect(screen.getByText(/ai-generated tags/i)).toBeInTheDocument();
@@ -97,14 +95,12 @@ describe('NewDecisionPage', () => {
     vi.spyOn(api, 'post').mockRejectedValue(new Error('Simulated API error'));
 
     render(
-  <MemoryRouter>
-    <NewDecisionPage />
-  </MemoryRouter>
-);
+      <MemoryRouter>
+        <NewDecisionPage />
+      </MemoryRouter>
+    );
     fireEvent.change(screen.getByLabelText(/title/i, { exact: false }), { target: { value: 'Test Title' } });
     fireEvent.change(screen.getByLabelText(/context/i, { exact: false }), { target: { value: 'Test context' } });
-    fireEvent.change(screen.getByLabelText(/anticipated outcomes/i, { exact: false }), { target: { value: 'Outcome' } });
-    fireEvent.change(screen.getByLabelText(/values/i, { exact: false }), { target: { value: 'integrity' } });
     // Use act to flush all React state updates
     await act(async () => {
       await fireEvent.click(screen.getByRole('button', { name: /submit/i }));

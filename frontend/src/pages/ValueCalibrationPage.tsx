@@ -41,7 +41,6 @@ const ValueCalibrationPage: React.FC<ValueCalibrationPageProps> = ({ initialValu
 
   useEffect(() => {
     fetchHistory();
-    // eslint-disable-next-line
   }, []);
 
   const fetchHistory = async () => {
@@ -50,7 +49,7 @@ const ValueCalibrationPage: React.FC<ValueCalibrationPageProps> = ({ initialValu
     try {
       const data = await listValueCalibrationCheckins();
       setHistory(data);
-    } catch (err: any) {
+    } catch {
       setHistoryError('Failed to load check-in history.');
     } finally {
       setHistoryLoading(false);

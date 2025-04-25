@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DecisionJournalPage from '../DecisionJournalPage';
 import * as journalApi from '../../api/journal';
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 vi.mock('../../api/journal');
 
@@ -23,10 +23,12 @@ const mockEntries = [
 
 describe('DecisionJournalPage', () => {
   beforeEach(() => {
-  vi.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
-    if (key === 'jwt') return 'FAKE_TOKEN';
-    return null;
-  });
+    if (typeof window !== 'undefined') {
+      vi.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
+        if (key === 'jwt') return 'FAKE_TOKEN';
+        return null;
+      });
+    }
     vi.clearAllMocks();
   });
 

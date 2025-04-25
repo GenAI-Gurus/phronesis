@@ -14,8 +14,7 @@ import ReflectionPage from '../pages/ReflectionPage';
 import ReflectionPromptPage from '../pages/ReflectionPromptPage';
 import ChallengesPage from '../pages/ChallengesPage';
 import FutureSelfSimulatorPage from '../pages/FutureSelfSimulatorPage';
-import ProgressVisualizationPage from '../pages/ProgressVisualizationPage';
-import GamificationPage from '../pages/GamificationPage';
+
 import LifeThemePage from '../pages/LifeThemePage';
 import NotFoundPage from '../pages/NotFoundPage';
 import LandingPage from '../pages/LandingPage';
