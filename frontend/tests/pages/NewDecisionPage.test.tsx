@@ -81,7 +81,7 @@ describe('NewDecisionPage', () => {
       </MemoryRouter>
     );
     fireEvent.change(screen.getByLabelText(/title/i, { exact: false }), { target: { value: 'Test Title' } });
-    fireEvent.change(screen.getByLabelText(/context/i, { exact: false }), { target: { value: 'Test context' } });
+    fireEvent.change(screen.getByLabelText(/description/i, { exact: false }), { target: { value: 'Test description' } });
     fireEvent.click(screen.getByRole('button', { name: /submit/i }));
     await waitFor(() => {
       expect(screen.getByText(/ai-generated tags/i)).toBeInTheDocument();
@@ -100,7 +100,7 @@ describe('NewDecisionPage', () => {
       </MemoryRouter>
     );
     fireEvent.change(screen.getByLabelText(/title/i, { exact: false }), { target: { value: 'Test Title' } });
-    fireEvent.change(screen.getByLabelText(/context/i, { exact: false }), { target: { value: 'Test context' } });
+    fireEvent.change(screen.getByLabelText(/description/i, { exact: false }), { target: { value: 'Test description' } });
     // Use act to flush all React state updates
     await act(async () => {
       await fireEvent.click(screen.getByRole('button', { name: /submit/i }));
