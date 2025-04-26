@@ -6,8 +6,7 @@ import {
   ChatContainer,
   MessageList,
   Message as ChatUIMessage,
-  MessageInput,
-  TypingIndicator
+  TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 
 import { getOrCreateSession, getSessionMessages, postSessionMessage, endSession, getDecisionById, Session } from '../api/decisionChat';
@@ -122,6 +121,7 @@ const DecisionSupportChatPage: React.FC = () => {
                 sentTime: "just now",
                 sender: "AI",
                 direction: "incoming",
+                position: 'single'
               }} />
             )}
             {messages.map((msg, idx) => (
@@ -132,50 +132,49 @@ const DecisionSupportChatPage: React.FC = () => {
                   sentTime: msg.created_at || "just now",
                   sender: msg.sender === 'user' ? 'You' : 'AI',
                   direction: msg.sender === 'user' ? 'outgoing' : 'incoming',
+                  position: 'normal'
                 }}
               />
             ))}
           </MessageList>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <MessageInput
-              style={{ flex: 1, minWidth: 0 }}
+          {/* Native send controls */}
+          <div style={{ display: 'flex', gap: 8, padding: '8px' }}>
+            <input
+              type="text"
               placeholder="Type your message..."
               value={input}
-              onChange={setInput}
-              onSend={handleSend}
-              attachButton={false}
+              onChange={e => setInput(e.currentTarget.value)}
               disabled={loading}
               data-testid="chat-input"
+              style={{ flex: 1, padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
             />
             <button
-              style={{ padding: '4px 12px', borderRadius: 16, border: '1px solid #aaa', cursor: 'pointer', background: '#f5f5f5' }}
               onClick={() => handleSend(input)}
-              disabled={input.trim() === '' || loading}
+              disabled={loading || !input.trim()}
               data-testid="send-button"
-            >
-              Send
-            </button>
+              style={{ padding: '8px 16px', borderRadius: 4, border: 'none', backgroundColor: '#1976d2', color: '#fff', cursor: 'pointer' }}
+            >Send</button>
           </div>
-          {error && (
-            <div style={{ color: 'red', marginTop: 8 }}>{error}</div>
-          )}
-          {suggestions.length > 0 && (
-            <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {suggestions.map((s, i) => (
-                <button
-                  key={i}
-                  style={{ padding: '4px 12px', borderRadius: 16, border: '1px solid #aaa', cursor: 'pointer', background: '#f5f5f5' }}
-                  onClick={() => handleSend(s)}
-                  disabled={loading}
-                  data-testid={`suggestion-${i}`}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
         </ChatContainer>
       </MainContainer>
+      {error && (
+        <div style={{ color: 'red', marginTop: 8 }}>{error}</div>
+      )}
+      {suggestions.length > 0 && (
+        <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {suggestions.map((s, i) => (
+            <button
+              key={i}
+              style={{ padding: '4px 12px', borderRadius: 16, border: '1px solid #aaa', cursor: 'pointer', background: '#f5f5f5' }}
+              onClick={() => handleSend(s)}
+              disabled={loading}
+              data-testid={`suggestion-${i}`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
