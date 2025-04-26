@@ -136,15 +136,26 @@ const DecisionSupportChatPage: React.FC = () => {
               />
             ))}
           </MessageList>
-          <MessageInput
-            placeholder="Type your message..."
-            value={input}
-            onChange={setInput}
-            onSend={handleSend}
-            attachButton={false}
-            disabled={loading}
-            data-testid="chat-input"
-          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <MessageInput
+              style={{ flex: 1, minWidth: 0 }}
+              placeholder="Type your message..."
+              value={input}
+              onChange={setInput}
+              onSend={handleSend}
+              attachButton={false}
+              disabled={loading}
+              data-testid="chat-input"
+            />
+            <button
+              style={{ padding: '4px 12px', borderRadius: 16, border: '1px solid #aaa', cursor: 'pointer', background: '#f5f5f5' }}
+              onClick={() => handleSend(input)}
+              disabled={input.trim() === '' || loading}
+              data-testid="send-button"
+            >
+              Send
+            </button>
+          </div>
           {error && (
             <div style={{ color: 'red', marginTop: 8 }}>{error}</div>
           )}
