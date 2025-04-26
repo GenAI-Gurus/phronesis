@@ -54,3 +54,27 @@ export async function endSession(sessionId: string, summary?: string): Promise<S
   const { data } = await axios.patch(`/api/v1/sessions/${sessionId}`, { status: 'completed', summary });
   return data;
 }
+
+// 5. List all sessions for a decision
+export async function listSessions(decisionId: string): Promise<Session[]> {
+  const { data } = await axios.get(`/api/v1/decisions/${decisionId}/sessions`);
+  return data;
+}
+
+// 6. Get the summary of a session
+export async function getSessionSummary(sessionId: string): Promise<string> {
+  const { data } = await axios.get(`/api/v1/decisions/sessions/${sessionId}/summary`);
+  return data.summary;
+}
+
+// 7. Get the summary of a decision
+export async function getDecisionSummary(decisionId: string): Promise<string> {
+  const { data } = await axios.get(`/api/v1/decisions/${decisionId}/summary`);
+  return data.summary;
+}
+
+// 8. Chat endpoint for AI replies in a session
+export async function chatSession(sessionId: string, messages: { role: string; content: string }[]): Promise<{ reply: string; suggestions?: string[] }> {
+  const { data } = await axios.post(`/api/v1/decisions/sessions/${sessionId}/chat`, { messages });
+  return data;
+}

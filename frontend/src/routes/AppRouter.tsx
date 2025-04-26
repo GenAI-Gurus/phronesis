@@ -2,6 +2,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
+import SessionReviewPage from '../pages/SessionReviewPage';
+import DecisionRecapPage from '../pages/DecisionRecapPage';
 import RegisterPage from '../pages/RegisterPage';
 import DashboardPage from '../pages/DashboardPage';
 import DecisionSupportChatPage from '../pages/DecisionSupportChatPage';
@@ -27,6 +29,8 @@ const AppRouter: React.FC = () => (
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/decisions/:decisionId/chat" element={<DecisionSupportChatPage />} />
+      <Route path="/decisions/:decisionId/sessions/:sessionId/review" element={<SessionReviewPage />} />
+      <Route path="/decisions/:decisionId/summary" element={<DecisionRecapPage />} />
       <Route path="/journal" element={<JournalListPage />} />
       <Route path="/journal/new" element={<NewDecisionPage />} />
       <Route path="/journal/:id" element={<JournalDetailPage />} />

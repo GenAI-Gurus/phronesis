@@ -225,7 +225,6 @@ Decision (id)
   - Displays all decisions, categorized by domain_tags and sub-categorized by status (in progress, closed). Archived decisions are hidden unless user toggles "Show Archived".
   - Supports filtering, searching, and sorting by last updated.
 - **NewDecisionChatPage**
-  - Route: `/decisions/:decisionId/chat`
   - Renders chat UI, manages session state.
   - Handles AI/system prompts and user replies.
   - Shows progress/status.

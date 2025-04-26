@@ -40,6 +40,15 @@ npm run build
   ```
 - For local development, you can still use a `.env` file.
 
+## Setup
+
+### Prerequisites
+...
+
+### Installing dependencies
+- Run `npm install` to install core dependencies.
+- Run `npm install react-markdown` to add markdown support for chat UI.
+
 ## Project Structure
 
 See [STRUCTURE.md](./STRUCTURE.md) for directory and modularity details.

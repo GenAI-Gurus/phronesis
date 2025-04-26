@@ -3,7 +3,13 @@
 _This file tracks the status of all project tasks, milestones, and discovered work. For requirements and architecture, see specification.md._
 
 ## In Progress
-- [ ] Implement Chat for a New decision, instead of a form based approach
+- [ ] Implement Chat for a new decision, instead of a form-based approach, including:
+    - [x] Pre-chat summary display (last session & DecisionSummary)
+    - [x] Session controls (End Session button, status indicator)
+    - [x] Review pages (SessionReview and DecisionRecap)
+    - [x] Align AI endpoint with standard message APIs
+    - [ ] Rich text & system note support
+    - [ ] Unit tests for chat UI (stub/replace ChatScope)
     - The canonical specification and prompt engineering for the Decision Chat feature are documented in [docs/decision_chat_design.md](docs/decision_chat_design.md). All implementation, testing, and future enhancements should align with this document.
 
 ## Upcoming / TODO

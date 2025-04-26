@@ -10,11 +10,11 @@
     - [x] If not, create a new session via `POST /sessions` (include decision ID/title).
     - [x] If yes, fetch the session and its status.
 - [x] Fetch all messages for the session via `GET /sessions/{session_id}/messages` and display in chat UI.
-- [ ] When sending a message:
-    - [ ] POST the user message to `/sessions/{session_id}/messages`.
-    - [ ] Call `/chat` endpoint with full message history for AI reply.
-    - [ ] POST the AI reply to `/sessions/{session_id}/messages`.
-    - [ ] Update chat UI with both user and AI messages from backend.
+- [x] When sending a message:
+    - [x] POST the user message to `/sessions/{session_id}/messages`.
+    - [x] Call `/chat` endpoint with full message history for AI reply.
+    - [x] POST the AI reply to `/sessions/{session_id}/messages`.
+    - [x] Update chat UI with both user and AI messages from backend.
 
 ## 2. Implement Session Management UI
 - [x] Add controls to:
@@ -27,7 +27,7 @@
 
 ## 3. Link Chat to Decisions
 - [x] After creating a new decision, immediately redirect the user to the chat UI for that decision, passing the decisionId from the backend response.
-- [ ] Ensure all chat sessions/messages are associated with a specific decision (pass decision ID on create/fetch)
+- [x] Ensure all chat sessions/messages are associated with a specific decision (pass decision ID on create/fetch)
 - [x] Display decision context (title, description, tags) in the chat UI
 
 ## 4. Enhance LLM/AI Flows
@@ -37,8 +37,16 @@
 - [x] Unit tests cover the full sendMessage flow and error handling
 
 ## 5. Validate with System Tests
-- [ ] After each increment, run Playwright system tests for chat (chat.spec.ts)
-- [ ] Ensure each acceptance criterion is met and no regressions are introduced
+- [x] After each increment, run Playwright system tests for chat (chat.spec.ts)
+- [x] Ensure each acceptance criterion is met and no regressions are introduced
+
+## Discovered During Work
+- [x] Pre-chat summary display: fetch and show last session and DecisionSummary when no open session today
+- [x] Add session controls: ‘End Session’ button, session status indicator in chat header
+- [x] Review pages: implement SessionReviewPage and DecisionRecapPage with links
+- [x] Align AI endpoint: replace `/api/decision-support/chat` with official session message endpoints
+- [x] Rich text support: render markdown/rich messages and system notes distinctly
+- [x] Full unit tests for chat UI: stub or replace ChatScope to re-enable RTL tests
 
 ---
 
