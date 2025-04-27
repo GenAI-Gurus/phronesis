@@ -4,6 +4,9 @@ This document defines end-to-end (E2E) system tests for the Decision Chat featur
 
 ---
 
+## Implementation Status
+🎉 Implementation: All tests defined below are implemented in `system-tests/chat.spec.ts`, matching the Test X.Y labels.
+
 ## 1. Decision Creation & Listing
 
 **Test 1.1**: User can create a new decision via chat UI  

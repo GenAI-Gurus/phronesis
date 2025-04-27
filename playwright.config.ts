@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './system-tests', // Run system-level E2E tests
+  testDir: './system-tests', // Only run system-tests directory
   timeout: 30000,
   expect: {
     timeout: 5000,
