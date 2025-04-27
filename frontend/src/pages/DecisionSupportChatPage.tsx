@@ -63,7 +63,21 @@ const DecisionSupportChatPage: React.FC = () => {
         }
         // Fetch messages
         const msgs = await getSessionMessages(sess.id);
-        setMessages(msgs);
+        if (msgs.length === 0) {
+          // Initial AI greeting
+          const { reply: aiReply, suggestions: aiSuggestions } = await chatSession(
+            sess.id,
+            []
+          );
+          // Persist AI message
+          await postSessionMessage(sess.id, { sender: 'ai', content: aiReply });
+          // Re-fetch messages
+          const updatedMsgs = await getSessionMessages(sess.id);
+          setMessages(updatedMsgs);
+          setSuggestions(aiSuggestions || []);
+        } else {
+          setMessages(msgs);
+        }
       } catch (e: any) {
         setError('Failed to load chat session or messages.');
       } finally {

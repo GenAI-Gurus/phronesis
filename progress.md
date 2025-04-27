@@ -8,8 +8,9 @@ _This file tracks the status of all project tasks, milestones, and discovered wo
     - [x] Session controls (End Session button, status indicator)
     - [x] Review pages (SessionReview and DecisionRecap)
     - [x] Align AI endpoint with standard message APIs
-    - [ ] Rich text & system note support
-    - [ ] Unit tests for chat UI (stub/replace ChatScope)
+    - [x] Rich text & system note support
+    - [x] Unit tests for chat UI (stub/replace ChatScope)
+    - [ ] E2E tests for chat UI
     - The canonical specification and prompt engineering for the Decision Chat feature are documented in [docs/decision_chat_design.md](docs/decision_chat_design.md). All implementation, testing, and future enhancements should align with this document.
 
 ## Upcoming / TODO
